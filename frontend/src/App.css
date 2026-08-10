@@ -1,0 +1,122 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0b0b12;
+  color: white;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.landing-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 40%, #25204a 0%, #0b0b12 55%);
+}
+
+.navbar {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 7%;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.login-button,
+.get-started-button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.login-button {
+  background: transparent;
+  color: white;
+  border: 1px solid #555;
+}
+
+.hero {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.hero-content {
+  max-width: 800px;
+}
+
+.tagline {
+  font-size: 13px;
+  letter-spacing: 3px;
+  margin-bottom: 24px;
+  opacity: 0.7;
+}
+
+.hero h1 {
+  font-size: clamp(48px, 8vw, 88px);
+  line-height: 1;
+  margin-bottom: 28px;
+}
+
+.hero h1 span {
+  opacity: 0.55;
+}
+
+.description {
+  max-width: 600px;
+  margin: 0 auto 35px;
+  font-size: 18px;
+  line-height: 1.7;
+  opacity: 0.7;
+}
+
+.get-started-button {
+  background: white;
+  color: #111;
+  padding: 15px 32px;
+  transition: transform 0.2s ease;
+}
+
+.get-started-button:hover {
+  transform: translateY(-3px);
+}
+
+.login-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 5%;
+  }
+
+  .logo {
+    font-size: 19px;
+  }
+
+  .hero h1 {
+    font-size: 50px;
+  }
+
+  .description {
+    font-size: 16px;
+  }
+}
