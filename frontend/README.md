@@ -1,7 +1,4 @@
 # StudentSENSEI
-<<<<<<< HEAD
-HTML CSS JAVASCRIPT (GIT , GITHUB , VSCODE)
-=======
 
 StudentSENSEI is a personalized and gamified study planner designed to help students plan their studies, stay focused, track their progress, and receive AI-powered study guidance.
 
@@ -23,4 +20,3 @@ Plan → Study → Track → Reward → Analyze → Improve
 ## Project Status
 
 🚧 Development Started
->>>>>>> 033a95b7ebcc937026d3fbb70819b70f5c055a0e
