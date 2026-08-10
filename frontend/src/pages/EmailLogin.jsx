@@ -4,9 +4,11 @@ function EmailLogin() {
   const navigate = useNavigate();
 
   return (
-    <div className="email-login-page">
-      <div className="email-login-card">
+    <div className="login-page">
 
+      <div className="login-card">
+
+        {/* Back Button */}
         <button
           className="back-button"
           onClick={() => navigate("/login")}
@@ -14,7 +16,9 @@ function EmailLogin() {
           ← Back
         </button>
 
-        <div className="email-login-header">
+        {/* Header */}
+        <div className="login-header">
+
           <div className="login-logo">
             Student<span>SENSEI</span>
           </div>
@@ -32,12 +36,12 @@ function EmailLogin() {
             Enter your email and password to continue
             your StudentSENSEI journey.
           </p>
+
         </div>
 
-        <form
-          className="email-form"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        {/* Email Form */}
+        <form className="email-form">
+
           <div className="input-group">
             <label htmlFor="email">
               Email
@@ -47,6 +51,7 @@ function EmailLogin() {
               id="email"
               type="email"
               placeholder="you@example.com"
+              required
             />
           </div>
 
@@ -59,6 +64,7 @@ function EmailLogin() {
               id="password"
               type="password"
               placeholder="Enter your password"
+              required
             />
           </div>
 
@@ -68,8 +74,10 @@ function EmailLogin() {
           >
             Sign In
           </button>
+
         </form>
 
+        {/* Sign Up */}
         <p className="signup-text">
           Don't have an account?{" "}
           <button
@@ -80,12 +88,14 @@ function EmailLogin() {
           </button>
         </p>
 
+        {/* Footer */}
         <p className="login-footer">
           By continuing, you agree to the
           StudentSENSEI Terms & Privacy Policy.
         </p>
 
       </div>
+
     </div>
   );
 }
