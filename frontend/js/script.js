@@ -1,0 +1,1 @@
+console.log("StudentSENSEI frontend loaded successfully.");
