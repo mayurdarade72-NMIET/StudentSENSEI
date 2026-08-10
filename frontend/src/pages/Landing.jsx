@@ -11,7 +11,6 @@ function Landing() {
 
   return (
     <div className="landing-page">
-
       {/* Navigation */}
       <nav className="navbar">
         <div className="logo">
@@ -29,7 +28,6 @@ function Landing() {
       {/* Hero Section */}
       <main className="hero">
         <div className="hero-content">
-
           <p className="tagline">
             BUILD DISCIPLINE • BUILD YOUR FUTURE
           </p>
@@ -47,7 +45,6 @@ function Landing() {
           </p>
 
           <div className="hero-actions">
-
             <button
               className="get-started-button"
               onClick={() => navigate("/login")}
@@ -61,7 +58,6 @@ function Landing() {
             >
               Explore StudentSENSEI
             </button>
-
           </div>
         </div>
       </main>
@@ -72,7 +68,6 @@ function Landing() {
         id="features"
       >
         <div className="section-heading">
-
           <p className="section-label">
             WHY STUDENTSENSEI?
           </p>
@@ -86,12 +81,11 @@ function Landing() {
             Everything you need to build a disciplined study
             routine and keep moving forward.
           </p>
-
         </div>
 
         {/* Feature Cards */}
-        <div className="feature-grid">
-
+        <div className="features-grid">
+          {/* Card 1 */}
           <article className="feature-card">
             <div className="feature-icon">
               📚
@@ -107,6 +101,7 @@ function Landing() {
             </p>
           </article>
 
+          {/* Card 2 */}
           <article className="feature-card">
             <div className="feature-icon">
               ⏱️
@@ -122,6 +117,7 @@ function Landing() {
             </p>
           </article>
 
+          {/* Card 3 */}
           <article className="feature-card">
             <div className="feature-icon">
               🏆
@@ -136,10 +132,8 @@ function Landing() {
               stay motivated as you improve.
             </p>
           </article>
-
         </div>
       </section>
-
     </div>
   );
 }
