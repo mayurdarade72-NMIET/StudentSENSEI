@@ -1,0 +1,695 @@
+/* =========================================
+   FOCUS PAGE
+========================================= */
+
+.focus-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, #123b27, #06130d 60%);
+  color: white;
+  font-family: Arial, sans-serif;
+  padding-bottom: 60px;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.focus-navbar {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 5%;
+
+  background: rgba(5, 15, 10, 0.92);
+  border-bottom: 1px solid rgba(130, 255, 150, 0.25);
+}
+
+.focus-logo {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.focus-logo span {
+  color: #58ff77;
+}
+
+.focus-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.focus-nav-right span {
+  color: #75ff8c;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.focus-nav-right button {
+  border: 1px solid #54c86b;
+  background: rgba(50, 150, 70, 0.2);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.focus-header {
+  text-align: center;
+  padding: 60px 20px 30px;
+}
+
+.focus-header p {
+  color: #63ff82;
+  font-weight: bold;
+  letter-spacing: 2px;
+  font-size: 13px;
+}
+
+.focus-header h1 {
+  font-size: clamp(40px, 6vw, 68px);
+  margin: 10px 0;
+}
+
+.focus-header span {
+  color: #b5c7bc;
+}
+
+
+/* =========================================
+   MAIN MINE
+========================================= */
+
+.mine-container {
+  width: min(1000px, 92%);
+  margin: auto;
+}
+
+
+/* =========================================
+   MINE BACKGROUND
+========================================= */
+
+.mine-background {
+  height: 370px;
+  position: relative;
+  overflow: hidden;
+
+  border: 2px solid rgba(110, 255, 130, 0.35);
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      rgba(20, 30, 25, 0.35),
+      rgba(5, 10, 7, 0.9)
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #252d29 0px,
+      #252d29 35px,
+      #1c2420 36px,
+      #1c2420 70px
+    );
+
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.8),
+    0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================
+   MINE ROCKS
+========================================= */
+
+.mine-rock {
+  position: absolute;
+  font-size: 55px;
+  opacity: 0.8;
+}
+
+.rock-one {
+  left: 8%;
+  bottom: 35px;
+}
+
+.rock-two {
+  right: 10%;
+  bottom: 45px;
+}
+
+.rock-three {
+  left: 42%;
+  top: 35px;
+}
+
+
+/* =========================================
+   LAMPS
+========================================= */
+
+.mine-lamp {
+  position: absolute;
+  font-size: 30px;
+  filter: drop-shadow(0 0 15px orange);
+}
+
+.lamp-one {
+  left: 15%;
+  top: 40%;
+}
+
+.lamp-two {
+  right: 15%;
+  top: 40%;
+}
+
+
+/* =========================================
+   PLAYER
+========================================= */
+
+.mine-player {
+  position: absolute;
+
+  left: 50%;
+  bottom: 40px;
+
+  transform: translateX(-50%);
+
+  font-size: 90px;
+
+  filter:
+    drop-shadow(0 0 15px rgba(100, 255, 120, 0.5));
+}
+
+
+/* =========================================
+   CART
+========================================= */
+
+.mine-cart {
+  position: absolute;
+  right: 25%;
+  bottom: 25px;
+
+  font-size: 60px;
+}
+
+
+/* =========================================
+   TIMER PANEL
+========================================= */
+
+.timer-panel {
+  text-align: center;
+
+  margin-top: -30px;
+  position: relative;
+
+  width: min(600px, 90%);
+
+  margin-left: auto;
+  margin-right: auto;
+
+  padding: 30px;
+
+  background: rgba(15, 35, 23, 0.95);
+
+  border: 1px solid rgba(100, 255, 130, 0.4);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.timer-panel > p:first-child {
+  color: #75ff8c;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.timer {
+  font-size: clamp(60px, 10vw, 100px);
+  font-weight: 900;
+  letter-spacing: 5px;
+  margin: 10px 0;
+}
+
+.focus-message {
+  color: #aabbb0;
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.start-mining-button,
+.mine-button {
+  border: none;
+  padding: 15px 35px;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #42df61,
+    #15963a
+  );
+
+  color: white;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 25px rgba(50, 230, 90, 0.25);
+
+  transition: 0.2s;
+}
+
+.start-mining-button:hover,
+.mine-button:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 12px 30px rgba(50, 230, 90, 0.4);
+}
+
+.end-session-button {
+  display: block;
+
+  margin: 15px auto 0;
+
+  background: transparent;
+  border: none;
+
+  color: #ff8f8f;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   BLOCKS
+========================================= */
+
+.blocks-card {
+  margin-top: 30px;
+
+  padding: 25px;
+
+  background: rgba(15, 35, 23, 0.9);
+
+  border: 1px solid rgba(100, 255, 130, 0.25);
+
+  border-radius: 15px;
+}
+
+.blocks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.blocks-header p {
+  color: #8aff9a;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.blocks-header h2 {
+  margin: 5px 0;
+}
+
+.blocks-header strong {
+  color: #71ff87;
+  font-size: 20px;
+}
+
+.blocks-progress {
+  height: 15px;
+
+  background: #09150e;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  margin-top: 15px;
+}
+
+.blocks-progress-fill {
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #27c94f,
+      #b7ff5b
+    );
+
+  transition: width 0.3s ease;
+}
+
+
+/* =========================================
+   REWARDS
+========================================= */
+
+.reward-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 15px;
+
+  margin-top: 20px;
+}
+
+.reward-card {
+  padding: 25px 15px;
+
+  text-align: center;
+
+  background: rgba(15, 35, 23, 0.8);
+
+  border: 1px solid rgba(100, 255, 130, 0.2);
+
+  border-radius: 12px;
+}
+
+.reward-card span {
+  display: block;
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.reward-card strong {
+  display: block;
+  font-size: 18px;
+}
+
+.reward-card small {
+  display: block;
+  color: #91a69a;
+  margin-top: 5px;
+}
+
+
+/* =========================================
+   COMPLETION OVERLAY
+========================================= */
+
+.completion-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(0, 0, 0, 0.75);
+
+  backdrop-filter: blur(8px);
+}
+
+
+/* =========================================
+   POPUP
+========================================= */
+
+.completion-popup {
+  position: relative;
+  z-index: 10;
+
+  width: min(500px, 90%);
+
+  padding: 40px;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #173d25,
+      #0b2113
+    );
+
+  border: 2px solid #67ff83;
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 0 70px rgba(70, 255, 100, 0.3);
+
+  animation:
+    popupAppear 0.5s ease;
+}
+
+@keyframes popupAppear {
+
+  from {
+    opacity: 0;
+    transform: scale(0.7) translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+}
+
+.completion-icon {
+  font-size: 70px;
+
+  animation:
+    trophyBounce 1s infinite alternate;
+}
+
+@keyframes trophyBounce {
+
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-8px);
+  }
+
+}
+
+.completion-label {
+  color: #73ff8c;
+  font-weight: bold;
+  letter-spacing: 3px;
+  font-size: 12px;
+}
+
+.completion-popup h2 {
+  font-size: 32px;
+  margin: 10px 0;
+}
+
+.completion-popup > p {
+  color: #b4c7ba;
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   COMPLETION REWARDS
+========================================= */
+
+.completion-rewards {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 15px;
+
+  margin: 25px 0;
+}
+
+.completion-rewards div {
+  padding: 15px 25px;
+
+  background: rgba(80, 255, 110, 0.1);
+
+  border: 1px solid rgba(100, 255, 130, 0.3);
+
+  border-radius: 10px;
+
+  font-size: 20px;
+}
+
+.completion-rewards strong {
+  display: block;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+
+/* =========================================
+   COMPLETION BUTTON
+========================================= */
+
+.continue-button {
+  width: 100%;
+
+  padding: 15px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #45ed62,
+    #15943b
+  );
+
+  color: white;
+
+  font-weight: bold;
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+.reset-button {
+  margin-top: 15px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #9db3a4;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   CONFETTI
+========================================= */
+
+.confetti-container {
+  position: absolute;
+
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+
+  top: -30px;
+
+  left: var(--x);
+
+  width: 9px;
+  height: 18px;
+
+  background: #65ff7c;
+
+  animation:
+    confettiFall 3.5s var(--delay) linear forwards;
+
+  transform: rotate(var(--rotation));
+}
+
+.confetti:nth-child(3n) {
+  background: #ffd84d;
+  width: 7px;
+  height: 12px;
+}
+
+.confetti:nth-child(3n + 1) {
+  background: #61d9ff;
+  border-radius: 50%;
+}
+
+.confetti:nth-child(5n) {
+  background: #ff6b9d;
+  width: 12px;
+  height: 7px;
+}
+
+@keyframes confettiFall {
+
+  0% {
+    transform:
+      translateY(-20px)
+      rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translateY(110vh)
+      rotate(720deg);
+    opacity: 0;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .focus-navbar {
+    padding: 0 20px;
+  }
+
+  .focus-nav-right span {
+    display: none;
+  }
+
+  .mine-background {
+    height: 280px;
+  }
+
+  .mine-player {
+    font-size: 65px;
+  }
+
+  .reward-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .completion-popup {
+    padding: 25px;
+  }
+
+  .completion-popup h2 {
+    font-size: 25px;
+  }
+
+}

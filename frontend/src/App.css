@@ -1,806 +1,612 @@
+/* =========================================================
+   STUDENTSENSEI — MINECRAFT OVERWORLD DASHBOARD
+   ========================================================= */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  font-family: Arial, sans-serif;
-  background: #0b0b12;
-  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #101810;
+  color: #f4f4f4;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
+/* =========================================================
+   DASHBOARD PAGE
+   ========================================================= */
 
-/* =========================
-   MAIN PAGE
-========================= */
-
-.landing-page {
+.dashboard-page {
   min-height: 100vh;
   background:
+    linear-gradient(
+      rgba(8, 20, 10, 0.82),
+      rgba(8, 15, 9, 0.94)
+    ),
     radial-gradient(
-      circle at 50% 25%,
-      #25204a 0%,
-      #0b0b12 60%
+      circle at 50% 10%,
+      #315c32 0%,
+      #172b1a 38%,
+      #0b110c 75%
     );
+  overflow-x: hidden;
 }
 
-/* =========================
+/* =========================================================
    NAVBAR
-========================= */
+   ========================================================= */
 
-.navbar {
-  height: 80px;
+.dashboard-navbar {
+  min-height: 76px;
+  padding: 0 6%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 7%;
+
+  background: rgba(8, 14, 9, 0.82);
+  border-bottom: 2px solid rgba(117, 168, 91, 0.3);
+
+  backdrop-filter: blur(10px);
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: 700;
+.dashboard-logo {
+  font-size: 25px;
+  font-weight: 900;
   letter-spacing: 1px;
 }
 
-.logo span {
-  opacity: 0.65;
+.dashboard-logo span {
+  color: #72c452;
 }
 
-.login-button {
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  padding: 11px 22px;
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  background: transparent;
+.dashboard-badge {
+  padding: 8px 14px;
+
+  background: #252c23;
+  border: 2px solid #65705c;
+  border-radius: 6px;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.logout-button {
+  padding: 9px 16px;
+
   color: white;
+  background: transparent;
 
-  font-size: 15px;
-  font-weight: 600;
+  border: 2px solid #697166;
+  border-radius: 6px;
+
+  font-weight: 700;
+  cursor: pointer;
 
   transition: 0.2s ease;
 }
 
-.login-button:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
+.logout-button:hover {
+  background: #354432;
+  border-color: #8fba78;
 }
 
-/* =========================
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.dashboard-main {
+  width: min(1200px, 92%);
+  margin: auto;
+  padding: 55px 0 70px;
+}
+
+/* =========================================================
    HERO
-========================= */
+   ========================================================= */
 
-.hero {
-  min-height: calc(100vh - 80px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+.dashboard-hero {
   text-align: center;
-
-  padding: 80px 20px;
-}
-
-.hero-content {
-  width: 100%;
-  max-width: 900px;
-}
-
-.tagline {
-  font-size: 13px;
-  letter-spacing: 3px;
-
-  margin-bottom: 25px;
-
-  opacity: 0.65;
-}
-
-.hero h1 {
-  margin: 0 0 30px;
-
-  font-size: clamp(48px, 7vw, 82px);
-
-  /* IMPORTANT: prevents overlap */
-  line-height: 1.12;
-
-  letter-spacing: -2px;
-}
-
-.hero h1 span {
-  display: inline-block;
-  opacity: 0.55;
-
-  /* extra spacing between lines */
-  margin-top: 8px;
-}
-
-.description {
-  max-width: 700px;
-
-  margin: 0 auto 35px;
-
-  font-size: 18px;
-  line-height: 1.7;
-
-  opacity: 0.7;
-}
-
-/* =========================
-   HERO BUTTONS
-========================= */
-
-.hero-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  gap: 14px;
-
-  flex-wrap: wrap;
-}
-
-.get-started-button,
-.secondary-button {
-  padding: 15px 30px;
-
-  border-radius: 10px;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  transition: 0.2s ease;
-}
-
-.get-started-button {
-  border: none;
-
-  background: white;
-  color: #111;
-}
-
-.get-started-button:hover {
-  transform: translateY(-3px);
-}
-
-.secondary-button {
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  background: transparent;
-  color: white;
-}
-
-.secondary-button:hover {
-  background: rgba(255, 255, 255, 0.08);
-
-  transform: translateY(-3px);
-}
-
-/* =========================
-   FEATURES SECTION
-========================= */
-
-.features-section {
-  padding: 110px 7%;
-
-  text-align: center;
-}
-
-.section-heading {
-  max-width: 750px;
-
-  margin: 0 auto 60px;
-}
-
-.section-label {
-  margin-bottom: 15px;
-
-  font-size: 13px;
-
-  letter-spacing: 3px;
-
-  opacity: 0.6;
-}
-
-.section-heading h2 {
-  margin-bottom: 20px;
-
-  font-size: clamp(32px, 5vw, 52px);
-
-  line-height: 1.15;
-}
-
-.section-heading h2 span {
-  opacity: 0.55;
-}
-
-.section-heading > p:last-child {
-  font-size: 17px;
-
-  line-height: 1.7;
-
-  opacity: 0.65;
-}
-
-/* =========================
-   FEATURE GRID
-========================= */
-
-.features-grid {
-  width: 100%;
-  max-width: 1100px;
-
-  margin: 0 auto;
-
-  display: grid;
-
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 24px;
-}
-
-/* =========================
-   FEATURE CARD
-========================= */
-
-.feature-card {
-  padding: 38px 28px;
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  border-radius: 20px;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  backdrop-filter: blur(10px);
-
-  transition:
-    transform 0.25s ease,
-    background 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-8px);
-
-  background: rgba(255, 255, 255, 0.07);
-
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.feature-icon {
-  width: 64px;
-  height: 64px;
-
-  margin: 0 auto 22px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 16px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  font-size: 30px;
-}
-
-.feature-card h3 {
-  margin-bottom: 14px;
-
-  font-size: 21px;
-}
-
-.feature-card p {
-  font-size: 15px;
-
-  line-height: 1.7;
-
-  opacity: 0.65;
-}
-
-/* =========================
-   TABLET
-========================= */
-
-@media (max-width: 800px) {
-
-  .features-grid {
-    grid-template-columns: 1fr;
-
-    max-width: 500px;
-  }
-
-  .features-section {
-    padding: 80px 5%;
-  }
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 600px) {
-
-  .navbar {
-    padding: 0 5%;
-  }
-
-  .logo {
-    font-size: 19px;
-  }
-
-  .hero {
-    padding: 60px 20px;
-  }
-
-  .hero h1 {
-    font-size: 50px;
-
-    line-height: 1.12;
-
-    letter-spacing: -1px;
-  }
-
-  .description {
-    font-size: 16px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-  }
-
-  .get-started-button,
-  .secondary-button {
-    width: 100%;
-    max-width: 280px;
-  }
-}
-/* =========================
-   LOGIN PAGE
-========================= */
-
-.login-page {
-  min-height: 100vh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 40px 20px;
+  padding: 45px 20px 35px;
 
   background:
     radial-gradient(
-      circle at 50% 30%,
-      #25204a 0%,
-      #0b0b12 65%
+      circle at center,
+      rgba(73, 125, 61, 0.25),
+      transparent 70%
     );
 }
 
-.login-card {
-  position: relative;
+.world-label {
+  margin-bottom: 16px;
 
-  width: 100%;
-  max-width: 480px;
+  color: #8fdb70;
 
-  padding: 45px 40px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
 
-  border: 1px solid rgba(255, 255, 255, 0.12);
+.dashboard-hero h1 {
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 1;
+  margin-bottom: 20px;
 
-  border-radius: 24px;
+  text-shadow:
+    3px 3px 0 #172217,
+    0 0 25px rgba(110, 180, 90, 0.2);
+}
 
-  background: rgba(255, 255, 255, 0.045);
+.dashboard-hero p {
+  max-width: 650px;
+  margin: auto;
 
-  backdrop-filter: blur(15px);
+  color: #c7d0c4;
+
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   XP SECTION
+   ========================================================= */
+
+.xp-section {
+  margin: 20px 0 30px;
+  padding: 20px;
+
+  background: rgba(55, 75, 56, 0.75);
+
+  border: 2px solid #657b62;
+  border-radius: 8px;
 
   box-shadow:
-    0 25px 80px rgba(0, 0, 0, 0.35);
-
-  text-align: center;
+    inset 0 0 0 2px rgba(0, 0, 0, 0.2),
+    0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-.back-button {
-  position: absolute;
+.xp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  top: 22px;
-  left: 22px;
-
-  border: none;
-
-  background: transparent;
-
-  color: rgba(255, 255, 255, 0.7);
-
-  font-size: 14px;
-
-  cursor: pointer;
+  margin-bottom: 12px;
 }
 
-.back-button:hover {
-  color: white;
-}
-
-.login-logo {
-  margin-bottom: 35px;
-
-  font-size: 22px;
-
-  font-weight: 700;
-
+.xp-title {
+  font-weight: 900;
   letter-spacing: 1px;
 }
 
-.login-logo span {
-  opacity: 0.55;
+.xp-value {
+  color: #b8e891;
+  font-weight: 900;
 }
 
-.login-label {
-  margin-bottom: 12px;
+.xp-bar {
+  height: 18px;
 
-  font-size: 12px;
+  background: #101610;
 
-  letter-spacing: 3px;
+  border: 2px solid #263326;
+  border-radius: 4px;
 
-  opacity: 0.55;
+  overflow: hidden;
 }
 
-.login-header h1 {
-  margin-bottom: 18px;
+.xp-progress {
+  height: 100%;
 
-  font-size: clamp(38px, 6vw, 52px);
+  background:
+    linear-gradient(
+      90deg,
+      #4d9b39,
+      #9bea63
+    );
 
-  line-height: 1.08;
+  box-shadow:
+    inset 0 2px rgba(255, 255, 255, 0.3),
+    0 0 12px rgba(111, 214, 72, 0.4);
+
+  transition: width 0.5s ease;
 }
 
-.login-header h1 span {
-  display: block;
+.xp-subtitle {
+  margin-top: 9px;
 
-  opacity: 0.5;
+  color: #aeb9a9;
+
+  font-size: 13px;
 }
 
-.login-description {
-  max-width: 360px;
+/* =========================================================
+   DASHBOARD GRID
+   ========================================================= */
 
-  margin: 0 auto 35px;
-
-  font-size: 15px;
-
-  line-height: 1.7;
-
-  opacity: 0.6;
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
 }
 
-.login-actions {
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.dashboard-card {
+  position: relative;
+
+  padding: 27px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(50, 67, 52, 0.95),
+      rgba(27, 39, 29, 0.96)
+    );
+
+  border: 2px solid #60705e;
+  border-radius: 9px;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.08);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+
+  border-color: #83ad70;
+
+  box-shadow:
+    0 16px 35px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(100, 170, 80, 0.08);
+}
+
+.card-header {
   display: flex;
-
-  flex-direction: column;
-
-  gap: 14px;
-}
-
-.google-button,
-.email-button {
-  width: 100%;
-
-  min-height: 52px;
-
-  border-radius: 12px;
-
-  font-size: 15px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-}
-
-.google-button {
-  display: flex;
-
   align-items: center;
+  gap: 13px;
 
+  margin-bottom: 22px;
+}
+
+.card-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
   justify-content: center;
 
-  gap: 12px;
+  background: #536250;
 
-  border: none;
+  border: 2px solid #788473;
+  border-radius: 7px;
 
-  background: white;
-
-  color: #111;
+  font-size: 22px;
 }
 
-.google-button:hover {
-  transform: translateY(-2px);
+.card-header h2 {
+  font-size: 22px;
 }
 
-.google-icon {
-  font-size: 20px;
+/* =========================================================
+   QUESTS
+   ========================================================= */
 
-  font-weight: 700;
-}
-
-.email-button {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-
-  background: rgba(255, 255, 255, 0.04);
-
-  color: white;
-}
-
-.email-button:hover {
-  background: rgba(255, 255, 255, 0.08);
-
-  transform: translateY(-2px);
-}
-
-.divider {
+.quest-list {
   display: flex;
+  flex-direction: column;
+}
 
+.quest-item {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 
   gap: 15px;
 
-  margin: 5px 0;
+  padding: 17px 0;
 
-  color: rgba(255, 255, 255, 0.35);
-
-  font-size: 11px;
-
-  letter-spacing: 2px;
+  border-top: 1px solid rgba(150, 170, 145, 0.18);
 }
 
-.divider::before,
-.divider::after {
-  content: "";
-
-  flex: 1;
-
-  height: 1px;
-
-  background: rgba(255, 255, 255, 0.1);
+.quest-item:first-child {
+  border-top: none;
 }
 
-.login-footer {
-  margin-top: 30px;
+.quest-info h3 {
+  margin-bottom: 6px;
 
-  font-size: 11px;
-
-  line-height: 1.6;
-
-  opacity: 0.4;
+  font-size: 16px;
 }
 
-@media (max-width: 600px) {
-  .login-card {
-    padding: 40px 25px;
-  }
-}
-/* =========================
-   EMAIL LOGIN
-========================= */
-
-.email-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 10px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
-}
-
-.input-group label {
+.quest-info p {
+  color: #aeb9a9;
   font-size: 13px;
-  font-weight: 600;
-  opacity: 0.75;
 }
 
-.input-group input {
-  width: 100%;
-  height: 52px;
+.xp-reward {
+  flex-shrink: 0;
 
-  padding: 0 16px;
+  padding: 7px 11px;
 
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  background: #4b7d39;
+  color: #eaffd8;
 
-  outline: none;
+  border: 2px solid #6da653;
+  border-radius: 5px;
 
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
-
-  font-size: 15px;
-
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease;
+  font-size: 12px;
+  font-weight: 900;
 }
 
-.input-group input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+/* =========================================================
+   FOCUS SESSION
+   ========================================================= */
+
+.focus-card {
+  text-align: center;
 }
 
-.input-group input:focus {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.08);
+.focus-description {
+  margin-bottom: 20px;
+
+  color: #aeb9a9;
+
+  font-size: 14px;
 }
 
-.email-submit-button {
-  width: 100%;
-  height: 52px;
+.timer {
+  margin: 20px 0;
 
-  margin-top: 5px;
+  font-size: clamp(50px, 7vw, 72px);
+  font-weight: 900;
+
+  letter-spacing: 3px;
+
+  color: #f3f3f3;
+
+  text-shadow:
+    3px 3px 0 #172217;
+}
+
+.start-button {
+  padding: 13px 28px;
+
+  background: #e9e9df;
+  color: #172217;
 
   border: none;
-  border-radius: 12px;
+  border-radius: 5px;
 
-  background: white;
-  color: #111;
-
-  font-size: 15px;
-  font-weight: 600;
-
+  font-weight: 900;
   cursor: pointer;
 
-  transition: transform 0.2s ease;
+  box-shadow:
+    0 4px 0 #8d9288;
+
+  transition: 0.15s ease;
 }
 
-.email-submit-button:hover {
-  transform: translateY(-2px);
+.start-button:hover {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 0 #8d9288;
 }
 
-.signup-text {
-  margin-top: 25px;
+/* =========================================================
+   PROGRESS CARD
+   ========================================================= */
 
-  font-size: 13px;
-
-  opacity: 0.6;
+.progress-list {
+  display: flex;
+  flex-direction: column;
 }
 
-.signup-button {
-  border: none;
+.progress-row {
+  display: flex;
+  justify-content: space-between;
 
-  background: transparent;
+  padding: 17px 0;
 
-  color: white;
-
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: 600;
-
-  cursor: pointer;
+  border-top: 1px solid rgba(150, 170, 145, 0.18);
 }
 
-.signup-button:hover {
-  text-decoration: underline;
+.progress-row:first-child {
+  border-top: none;
 }
-.email-login-page {
-  min-height: 100vh;
+
+.progress-label {
+  color: #aeb9a9;
+}
+
+.progress-value {
+  font-weight: 900;
+}
+
+.streak {
+  color: #ff8c3b;
+}
+
+/* =========================================================
+   WORLD CARD
+   ========================================================= */
+
+.world-card {
+  text-align: center;
+}
+
+.world-description {
+  margin-bottom: 20px;
+
+  color: #aeb9a9;
+}
+
+.world-preview {
+  min-height: 100px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  gap: 20px;
+
+  margin: 20px 0;
+  padding: 20px;
 
   background:
-    radial-gradient(
-      circle at 50% 30%,
-      #25204a 0%,
-      #0b0b12 60%
+    linear-gradient(
+      180deg,
+      #4d8b4a 0%,
+      #4d8b4a 55%,
+      #62472d 55%,
+      #62472d 100%
     );
 
-  color: white;
+  border: 2px solid #6d7e62;
+  border-radius: 7px;
+
+  font-size: 28px;
 }
 
-.email-login-card {
-  width: 100%;
-  max-width: 480px;
+.world-button {
+  padding: 11px 20px;
 
-  padding: 45px;
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  backdrop-filter: blur(20px);
-}
-
-.email-login-header {
-  text-align: center;
-  margin: 30px 0;
-}
-
-.email-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.input-group label {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 15px;
-
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-
-  background: rgba(255, 255, 255, 0.06);
-  color: white;
-
-  outline: none;
-  font-size: 15px;
-}
-
-.input-group input:focus {
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.input-group input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.email-submit-button {
-  width: 100%;
-  padding: 15px;
-
-  border: none;
-  border-radius: 10px;
-
-  background: white;
-  color: #111;
-
-  font-size: 15px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.email-submit-button:hover {
-  transform: translateY(-2px);
-}
-
-.signup-text {
-  text-align: center;
-  margin-top: 25px;
-  opacity: 0.7;
-}
-
-.signup-button {
-  border: none;
   background: transparent;
   color: white;
-  font-weight: 700;
+
+  border: 2px solid #72816e;
+  border-radius: 5px;
+
+  font-weight: 800;
   cursor: pointer;
+
+  transition: 0.2s ease;
 }
 
-.back-button {
-  border: none;
-  background: transparent;
-  color: white;
-  cursor: pointer;
+.world-button:hover {
+  background: #496044;
+  border-color: #8eb47d;
+}
+
+/* =========================================================
+   SENSEI SECTION
+   ========================================================= */
+
+.sensei-card {
+  grid-column: 1 / -1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 25px;
+
+  padding: 25px 30px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(38, 65, 47, 0.95),
+      rgba(28, 44, 33, 0.95)
+    );
+}
+
+.sensei-content h2 {
+  margin-bottom: 7px;
+
+  font-size: 20px;
+}
+
+.sensei-content p {
+  color: #aeb9a9;
   font-size: 14px;
+}
+
+/* =========================================================
+   GENERAL BUTTON EFFECT
+   ========================================================= */
+
+button {
+  font-family: inherit;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 850px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sensei-card {
+    grid-column: auto;
+  }
+
+  .dashboard-main {
+    width: 94%;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-navbar {
+    padding: 0 4%;
+  }
+
+  .dashboard-logo {
+    font-size: 19px;
+  }
+
+  .dashboard-actions {
+    gap: 5px;
+  }
+
+  .dashboard-badge {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .logout-button {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .dashboard-main {
+    padding-top: 25px;
+  }
+
+  .dashboard-hero {
+    padding: 30px 10px;
+  }
+
+  .dashboard-hero h1 {
+    font-size: 42px;
+  }
+
+  .dashboard-hero p {
+    font-size: 14px;
+  }
+
+  .dashboard-card {
+    padding: 20px;
+  }
+
+  .sensei-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

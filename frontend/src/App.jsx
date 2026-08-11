@@ -1,16 +1,95 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import EmailLogin from "./pages/EmailLogin";
+import Dashboard from "./pages/Dashboard";
+import Focus from "./pages/Focus";
+import World from "./pages/World";
+import Quests from "./pages/Quests";
+import Achievements from "./pages/Achievements";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/email-login" element={<EmailLogin />} />
+
+        {/* =====================================
+            DASHBOARD
+        ===================================== */}
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+
+        {/* =====================================
+            FOCUS MINE
+        ===================================== */}
+
+        <Route
+          path="/focus"
+          element={<Focus />}
+        />
+
+
+        {/* =====================================
+            QUESTS
+        ===================================== */}
+
+        <Route
+          path="/quests"
+          element={<Quests />}
+        />
+
+
+        {/* =====================================
+            WORLD
+        ===================================== */}
+
+        <Route
+          path="/world"
+          element={<World />}
+        />
+
+
+        {/* =====================================
+            ACHIEVEMENTS
+        ===================================== */}
+
+        <Route
+          path="/achievements"
+          element={<Achievements />}
+        />
+
+
+        {/* =====================================
+            DEFAULT PAGE
+        ===================================== */}
+
+        <Route
+          path="/"
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          }
+        />
+
+
+        {/* =====================================
+            UNKNOWN ROUTES
+        ===================================== */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

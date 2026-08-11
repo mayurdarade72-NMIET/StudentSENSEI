@@ -1,0 +1,744 @@
+/* =========================================
+   STUDENTSENSEI DASHBOARD
+   MINECRAFT OVERWORLD THEME
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+.dashboard-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, #163d27 0%, #07120c 45%, #030806 100%);
+  color: #f5f7f2;
+  font-family: Arial, sans-serif;
+  padding-bottom: 40px;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.dashboard-navbar {
+  width: 100%;
+  padding: 22px 5%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid rgba(130, 190, 120, 0.2);
+  background: rgba(3, 10, 6, 0.75);
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dashboard-logo {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.dashboard-logo span {
+  color: #72c94a;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-badge,
+.streak {
+  padding: 8px 14px;
+
+  border: 1px solid rgba(120, 190, 90, 0.5);
+  border-radius: 8px;
+
+  background: rgba(80, 130, 65, 0.2);
+
+  font-weight: 700;
+}
+
+.logout-button {
+  padding: 8px 14px;
+
+  border: 1px solid #657467;
+  border-radius: 8px;
+
+  background: transparent;
+  color: white;
+
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
+.dashboard-content {
+  width: min(1100px, 92%);
+  margin: auto;
+}
+
+
+/* =========================================
+   WELCOME
+========================================= */
+
+.welcome-section {
+  text-align: center;
+  padding: 75px 20px 35px;
+}
+
+.world-label {
+  color: #79d34f;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.welcome-section h1 {
+  margin: 15px 0;
+
+  font-size: clamp(40px, 6vw, 70px);
+  line-height: 1.05;
+}
+
+.welcome-section h1 span {
+  color: #c9d3c7;
+}
+
+.welcome-section > p:last-child {
+  color: #b8c2b8;
+  font-size: 17px;
+}
+
+
+/* =========================================
+   XP CARD
+========================================= */
+
+.xp-card {
+  padding: 20px;
+
+  border: 1px solid rgba(130, 190, 120, 0.35);
+  border-radius: 12px;
+
+  background: rgba(53, 90, 64, 0.55);
+
+  margin-bottom: 25px;
+}
+
+.xp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 12px;
+}
+
+.xp-header strong {
+  color: #d9e8d2;
+}
+
+.xp-header span {
+  color: #c7d2c5;
+  font-weight: 700;
+}
+
+.xp-bar {
+  height: 14px;
+
+  background: #07100a;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+}
+
+.xp-progress {
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    #55a936,
+    #a9ee62
+  );
+
+  border-radius: 20px;
+
+  transition: width 0.6s ease;
+}
+
+.xp-card p {
+  margin: 10px 0 0;
+
+  color: #b9c6b5;
+  font-size: 13px;
+}
+
+
+/* =========================================
+   DASHBOARD GRID
+========================================= */
+
+.dashboard-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+
+/* =========================================
+   CARDS
+========================================= */
+
+.dashboard-card {
+  padding: 26px;
+
+  min-height: 260px;
+
+  border: 1px solid rgba(130, 180, 120, 0.35);
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(48, 78, 58, 0.85),
+      rgba(17, 31, 23, 0.9)
+    );
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.3);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(140, 220, 100, 0.6);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 20px;
+}
+
+.card-title span {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(150, 180, 150, 0.18);
+
+  font-size: 20px;
+}
+
+.card-title h2 {
+  margin: 0;
+  font-size: 21px;
+}
+
+
+/* =========================================
+   QUESTS
+========================================= */
+
+.quest {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 15px 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.quest:last-child {
+  border-bottom: none;
+}
+
+.quest h3 {
+  margin: 0 0 5px;
+
+  font-size: 16px;
+}
+
+.quest p {
+  margin: 0;
+
+  color: #b7c2b6;
+
+  font-size: 13px;
+}
+
+.quest-xp {
+  white-space: nowrap;
+
+  padding: 7px 10px;
+
+  border-radius: 7px;
+
+  background: rgba(100, 170, 70, 0.25);
+
+  border: 1px solid rgba(130, 210, 100, 0.5);
+
+  color: #b7f07d;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* =========================================
+   FOCUS SESSION
+========================================= */
+
+.focus-card {
+  text-align: center;
+}
+
+.focus-card .card-title {
+  text-align: left;
+}
+
+.focus-card > p {
+  color: #b9c4b8;
+}
+
+.focus-time {
+  margin: 25px 0;
+
+  font-size: 55px;
+
+  font-weight: 800;
+
+  letter-spacing: 3px;
+}
+
+.primary-dashboard-button,
+.secondary-dashboard-button,
+.sensei-button {
+  padding: 12px 20px;
+
+  border-radius: 8px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.primary-dashboard-button {
+  border: none;
+
+  background: #79c653;
+
+  color: white;
+}
+
+.primary-dashboard-button:hover {
+  transform: translateY(-2px);
+
+  background: #91dc68;
+
+  box-shadow: 0 8px 20px rgba(100, 190, 70, 0.3);
+}
+
+
+/* =========================================
+   PROGRESS
+========================================= */
+
+.stat-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  padding: 17px 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row span {
+  color: #bbc6ba;
+}
+
+.stat-row strong {
+  color: white;
+}
+
+
+/* =========================================
+   YOUR WORLD
+========================================= */
+
+.world-card {
+  text-align: center;
+}
+
+.world-card .card-title {
+  text-align: left;
+}
+
+.world-card > p {
+  color: #b9c4b8;
+}
+
+.world-preview {
+  margin: 22px 0;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #477e43,
+      #28532e
+    );
+
+  border: 1px solid rgba(150, 220, 120, 0.45);
+
+  font-size: 28px;
+
+  letter-spacing: 8px;
+}
+
+.secondary-dashboard-button {
+  border: 1px solid #78947a;
+
+  background: transparent;
+
+  color: white;
+}
+
+.secondary-dashboard-button:hover {
+  background: rgba(120, 180, 100, 0.15);
+}
+
+
+/* =========================================
+   SENSEI
+========================================= */
+
+.sensei-card {
+  margin-top: 25px;
+
+  padding: 22px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  border: 1px solid rgba(130, 180, 120, 0.3);
+  border-radius: 12px;
+
+  background: rgba(40, 65, 48, 0.8);
+}
+
+.sensei-avatar {
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: rgba(140, 180, 140, 0.2);
+
+  font-size: 28px;
+}
+
+.sensei-card > div:nth-child(2) {
+  flex: 1;
+}
+
+.sensei-label {
+  margin: 0 0 5px;
+
+  color: #79d34f;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+}
+
+.sensei-card h2 {
+  margin: 0 0 5px;
+}
+
+.sensei-card p:last-child {
+  margin: 0;
+
+  color: #b8c3b7;
+
+  font-size: 13px;
+}
+
+.sensei-button {
+  border: 1px solid #78947a;
+
+  background: transparent;
+
+  color: white;
+}
+
+.sensei-button:hover {
+  background: rgba(120, 180, 100, 0.15);
+}
+
+
+/* =========================================
+   QUEST COMPLETE POPUP
+========================================= */
+
+.quest-complete-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+
+  background: rgba(0, 0, 0, 0.78);
+
+  backdrop-filter: blur(6px);
+}
+
+.quest-complete-card {
+  width: min(500px, 90%);
+
+  padding: 45px 35px;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #183c28,
+      #10261b
+    );
+
+  border: 3px solid #6fbf4a;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 0 0 4px rgba(111, 191, 74, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(111, 191, 74, 0.25);
+
+  animation: questPopup 0.45s ease-out;
+}
+
+.complete-icon {
+  font-size: 70px;
+
+  margin-bottom: 10px;
+
+  animation: celebration 1s ease-in-out infinite;
+}
+
+.complete-label {
+  color: #9be564;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  letter-spacing: 3px;
+}
+
+.quest-complete-card h2 {
+  margin: 5px 0 10px;
+
+  color: white;
+
+  font-size: 42px;
+}
+
+.quest-complete-card > p {
+  color: #cbd5c0;
+}
+
+.xp-reward {
+  display: inline-block;
+
+  margin: 25px 0 15px;
+
+  padding: 12px 24px;
+
+  border-radius: 10px;
+
+  background: rgba(111, 191, 74, 0.18);
+
+  border: 2px solid #79c950;
+
+  color: #b8ff7a;
+
+  font-size: 22px;
+
+  font-weight: 800;
+
+  animation: xpGlow 1.5s ease-in-out infinite;
+}
+
+.world-message {
+  color: #8ed35c !important;
+
+  font-weight: 700;
+}
+
+.quest-complete-card .primary-dashboard-button {
+  margin-top: 15px;
+
+  padding: 13px 28px;
+}
+
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes questPopup {
+
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.75)
+      translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1)
+      translateY(0);
+  }
+}
+
+@keyframes celebration {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+}
+
+@keyframes xpGlow {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px rgba(111, 191, 74, 0.2);
+  }
+
+  50% {
+    box-shadow:
+      0 0 25px rgba(111, 191, 74, 0.6);
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 750px) {
+
+  .dashboard-navbar {
+    padding: 18px 4%;
+  }
+
+  .dashboard-logo {
+    font-size: 19px;
+  }
+
+  .player-info {
+    gap: 6px;
+  }
+
+  .level-badge,
+  .streak,
+  .logout-button {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-section {
+    padding-top: 50px;
+  }
+
+  .welcome-section h1 {
+    font-size: 42px;
+  }
+
+  .sensei-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sensei-card > div:nth-child(2) {
+    width: 100%;
+  }
+
+  .xp-header {
+    font-size: 12px;
+  }
+
+  .quest-complete-card h2 {
+    font-size: 34px;
+  }
+}
