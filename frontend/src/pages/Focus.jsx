@@ -9,15 +9,10 @@ function Focus() {
   // SESSION SETTINGS
   // =========================================
 
-  // TEST DEFAULT: 1 minute
-  // Change this later if needed.
   const DEFAULT_DURATION = 1;
-
-  // Custom duration limits
   const MIN_DURATION = 1;
   const MAX_DURATION = 180;
 
-  // XP earned for every completed 30 minutes
   const XP_PER_30_MINUTES = 5;
 
   // =========================================
@@ -30,15 +25,14 @@ function Focus() {
   const [customMinutes, setCustomMinutes] =
     useState(String(DEFAULT_DURATION));
 
-  const [timeLeft, setTimeLeft] = useState(
-    DEFAULT_DURATION * 60
-  );
+  const [timeLeft, setTimeLeft] =
+    useState(DEFAULT_DURATION * 60);
 
   const [isRunning, setIsRunning] = useState(false);
   const [completed, setCompleted] = useState(false);
 
   // =========================================
-  // CALCULATE SESSION XP
+  // SESSION XP PREVIEW
   // =========================================
 
   const sessionXP =
@@ -183,81 +177,60 @@ function Focus() {
       return;
     }
 
-    // =========================================
-    // GET CURRENT XP
-    // =========================================
+    const completeSession = async () => {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/study-session",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              duration_minutes: selectedDuration,
+              session_type: "pomodoro",
+            }),
+          }
+        );
 
-    const currentXP =
-      Number(
-        localStorage.getItem("studentSenseiXP")
-      ) || 750;
+        const data = await response.json();
 
-    // =========================================
-    // ADD DURATION-BASED XP
-    // =========================================
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.message ||
+              "Failed to save study session"
+          );
+        }
 
-    const newXP = currentXP + sessionXP;
+        sessionStorage.setItem(
+          "focusSessionRewarded",
+          "true"
+        );
 
-    localStorage.setItem(
-      "studentSenseiXP",
-      String(newXP)
-    );
+        console.log(
+          "Study session saved successfully:",
+          data
+        );
+      } catch (error) {
+        console.error(
+          "Study session API error:",
+          error
+        );
+      }
+    };
 
-    // =========================================
-    // SAVE SESSION COUNT
-    // =========================================
-
-    const sessions =
-      Number(
-        localStorage.getItem(
-          "studentSenseiSessions"
-        )
-      ) || 0;
-
-    localStorage.setItem(
-      "studentSenseiSessions",
-      String(sessions + 1)
-    );
-
-    // =========================================
-    // SAVE BLOCKS
-    // =========================================
-
-    const totalBlocks =
-      Number(
-        localStorage.getItem(
-          "studentSenseiBlocks"
-        )
-      ) || 0;
-
-    localStorage.setItem(
-      "studentSenseiBlocks",
-      String(totalBlocks + blocks)
-    );
-
-    // =========================================
-    // PREVENT DUPLICATE REWARD
-    // =========================================
-
-    sessionStorage.setItem(
-      "focusSessionRewarded",
-      "true"
-    );
-  }, [completed, blocks, sessionXP]);
+    completeSession();
+  }, [completed, selectedDuration]);
 
   // =========================================
   // TIMER FORMAT
   // =========================================
 
-  const minutes = Math.floor(
-    timeLeft / 60
-  )
+  const minutes = Math.floor(timeLeft / 60)
     .toString()
     .padStart(2, "0");
 
-  const seconds = (
-    timeLeft % 60
-  )
+  const seconds = (timeLeft % 60)
     .toString()
     .padStart(2, "0");
 
@@ -365,7 +338,6 @@ function Focus() {
 
       </nav>
 
-
       {/* =====================================
           HEADER
       ===================================== */}
@@ -386,7 +358,6 @@ function Focus() {
         </span>
 
       </section>
-
 
       {/* =====================================
           MAIN MINE
@@ -425,7 +396,6 @@ function Focus() {
           </div>
 
         </div>
-
 
         {/* =================================
             TIMER PANEL
@@ -620,7 +590,6 @@ function Focus() {
 
         </section>
 
-
         {/* =================================
             BLOCKS MINED
         ================================= */}
@@ -659,7 +628,6 @@ function Focus() {
           </div>
 
         </section>
-
 
         {/* =================================
             REWARD CARDS
@@ -735,7 +703,6 @@ function Focus() {
 
       </main>
 
-
       {/* =====================================
           COMPLETION OVERLAY
       ===================================== */}
@@ -749,27 +716,26 @@ function Focus() {
           <div className="confetti-container">
 
             {Array.from({
-              length: 500,
-            }).map(
-              (_, index) => (
+              length: 100,
+            }).map((_, index) => (
 
-                <span
-                  key={index}
-                  className="confetti"
-                  style={{
-                    "--x": `${Math.random() * 100}vw`,
-                    "--delay": `${Math.random() * 2}s`,
-                    "--rotation": `${Math.random() * 360}deg`,
-                  }}
-                ></span>
+              <span
+                key={index}
+                className="confetti"
+                style={{
+                  "--x": `${Math.random() * 100}vw`,
+                  "--delay": `${Math.random() * 2}s`,
+                  "--rotation": `${Math.random() * 360}deg`,
+                }}
+              ></span>
 
-              )
-            )}
+            ))}
 
           </div>
 
-
-          {/* COMPLETION POPUP */}
+          {/* =================================
+              COMPLETION POPUP
+          ================================= */}
 
           <div className="completion-popup">
 
@@ -791,12 +757,9 @@ function Focus() {
               your mining session.
             </p>
 
-
-            {/* COMPLETION REWARDS */}
+            {/* REWARDS */}
 
             <div className="completion-rewards">
-
-              {/* SESSION DURATION */}
 
               <div>
 
@@ -814,9 +777,6 @@ function Focus() {
 
               </div>
 
-
-              {/* XP */}
-
               <div>
 
                 <span>
@@ -832,9 +792,6 @@ function Focus() {
                 </small>
 
               </div>
-
-
-              {/* BLOCKS */}
 
               <div>
 
@@ -854,7 +811,6 @@ function Focus() {
 
             </div>
 
-
             {/* CONTINUE */}
 
             <button
@@ -863,7 +819,6 @@ function Focus() {
             >
               ⚔️ Continue Adventure
             </button>
-
 
             {/* MINE AGAIN */}
 

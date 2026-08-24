@@ -10,8 +10,6 @@ function Dashboard() {
   // =========================================
 
   const [student, setStudent] = useState(null);
-  const [backendLoading, setBackendLoading] = useState(true);
-  const [backendError, setBackendError] = useState(false);
 
   // =========================================
   // LOCAL DATA
@@ -33,33 +31,11 @@ function Dashboard() {
     return saved ? Number(saved) : 0;
   };
 
-  const getBlocks = () => {
-    const saved = localStorage.getItem(
-      "studentSenseiBlocks"
-    );
-
-    return saved ? Number(saved) : 0;
-  };
-
-  const getLocalXP = () => {
-    const saved = localStorage.getItem(
-      "studentSenseiXP"
-    );
-
-    return saved ? Number(saved) : null;
-  };
-
   const [completedQuests, setCompletedQuests] =
     useState(getCompletedQuests());
 
   const [sessions, setSessions] =
     useState(getSessions());
-
-  const [blocks, setBlocks] =
-    useState(getBlocks());
-
-  const [localXP, setLocalXP] =
-    useState(getLocalXP());
 
   // =========================================
   // FETCH STUDENT FROM BACKEND
@@ -67,35 +43,31 @@ function Dashboard() {
 
   const fetchStudent = async () => {
     try {
-      setBackendLoading(true);
-
       const response = await fetch(
         "http://127.0.0.1:8000/api/student"
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch student");
+        throw new Error(
+          "Failed to fetch student"
+        );
       }
 
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error("Backend returned an error");
+        throw new Error(
+          "Backend returned an error"
+        );
       }
 
       setStudent(data.student);
-      setBackendError(false);
 
     } catch (error) {
       console.error(
         "Student API error:",
         error
       );
-
-      setBackendError(true);
-
-    } finally {
-      setBackendLoading(false);
     }
   };
 
@@ -111,14 +83,6 @@ function Dashboard() {
     setSessions(
       getSessions()
     );
-
-    setBlocks(
-      getBlocks()
-    );
-
-    setLocalXP(
-      getLocalXP()
-    );
   };
 
   // =========================================
@@ -129,29 +93,34 @@ function Dashboard() {
     fetchStudent();
     syncLocalData();
 
-    // Refresh when returning from Focus,
-    // Quests, or another page.
+    const handleFocus = () => {
+      fetchStudent();
+      syncLocalData();
+    };
+
+    const handleStorage = () => {
+      syncLocalData();
+    };
+
     window.addEventListener(
       "focus",
-      syncLocalData
+      handleFocus
     );
 
-    // Also react to localStorage changes
-    // from another browser tab.
     window.addEventListener(
       "storage",
-      syncLocalData
+      handleStorage
     );
 
     return () => {
       window.removeEventListener(
         "focus",
-        syncLocalData
+        handleFocus
       );
 
       window.removeEventListener(
         "storage",
-        syncLocalData
+        handleStorage
       );
     };
   }, []);
@@ -160,17 +129,8 @@ function Dashboard() {
   // PLAYER DATA
   // =========================================
 
-  /*
-    Focus sessions store XP in localStorage.
-
-    If local XP exists, use it.
-    Otherwise use the backend XP.
-  */
-
-  const xp =
-    localXP !== null
-      ? localXP
-      : student?.xp ?? 750;
+  // Backend is the source of truth for XP.
+  const xp = student?.xp ?? 0;
 
   const level =
     student?.level ??
@@ -183,7 +143,7 @@ function Dashboard() {
     student?.coins ?? 0;
 
   const backendWorld =
-    student?.current_world ?? "Starting Land";
+    student?.current_world ?? "";
 
   // =========================================
   // LEVEL PROGRESS
@@ -209,15 +169,19 @@ function Dashboard() {
   // WORLD
   // =========================================
 
-  let worldName = backendWorld;
+  let worldName =
+    backendWorld || "Starting Land";
 
-  if (!student?.current_world) {
-    worldName = "Starting Land";
+  // Fallback world progression if the
+  // backend does not provide a world.
 
+  if (!backendWorld) {
     if (xp >= 900) {
       worldName = "Village";
     } else if (xp >= 800) {
       worldName = "Growing Forest";
+    } else {
+      worldName = "Starting Land";
     }
   }
 
@@ -307,38 +271,6 @@ function Dashboard() {
 
 
       {/* =====================================
-          BACKEND STATUS
-      ===================================== */}
-
-      <div
-        style={{
-          position: "fixed",
-          top: "10px",
-          right: "10px",
-          zIndex: 9999,
-          padding: "8px 14px",
-          borderRadius: "8px",
-          background: backendLoading
-            ? "#f59e0b"
-            : backendError
-            ? "#ef4444"
-            : "#22c55e",
-          color: "white",
-          fontSize: "12px",
-          fontWeight: "700",
-          boxShadow:
-            "0 4px 12px rgba(0,0,0,0.2)",
-        }}
-      >
-        {backendLoading
-          ? "Loading student..."
-          : backendError
-          ? "Backend error"
-          : "Backend connected"}
-      </div>
-
-
-      {/* =====================================
           HERO
       ===================================== */}
 
@@ -355,9 +287,9 @@ function Dashboard() {
           </h1>
 
           <p className="dashboard-subtitle">
-            Welcome back, {playerName}. Complete
-            quests, focus your mind, and build
-            your world.
+            Welcome back, {playerName}.
+            Complete quests, focus your mind,
+            and build your world.
           </p>
 
         </div>
@@ -431,9 +363,9 @@ function Dashboard() {
 
       <main className="dashboard-grid">
 
-        {/* ===================================
+        {/* =================================
             QUESTS
-        =================================== */}
+        ================================= */}
 
         <article className="dashboard-card quests-card">
 
@@ -479,9 +411,9 @@ function Dashboard() {
         </article>
 
 
-        {/* ===================================
+        {/* =================================
             FOCUS
-        =================================== */}
+        ================================= */}
 
         <article className="dashboard-card focus-card">
 
@@ -516,9 +448,9 @@ function Dashboard() {
         </article>
 
 
-        {/* ===================================
+        {/* =================================
             WORLD
-        =================================== */}
+        ================================= */}
 
         <article className="dashboard-card world-card">
 
@@ -553,9 +485,9 @@ function Dashboard() {
         </article>
 
 
-        {/* ===================================
+        {/* =================================
             ACHIEVEMENTS
-        =================================== */}
+        ================================= */}
 
         <article className="dashboard-card achievement-card">
 
@@ -574,8 +506,8 @@ function Dashboard() {
             </h2>
 
             <p>
-              Track your trophies and unlock new
-              milestones.
+              Track your trophies and unlock
+              new milestones.
             </p>
 
           </div>
@@ -599,8 +531,6 @@ function Dashboard() {
 
       <section className="dashboard-stats">
 
-        {/* TOTAL XP */}
-
         <div className="dashboard-stat">
 
           <span>
@@ -621,8 +551,6 @@ function Dashboard() {
 
         </div>
 
-
-        {/* QUESTS */}
 
         <div className="dashboard-stat">
 
@@ -645,8 +573,6 @@ function Dashboard() {
         </div>
 
 
-        {/* FOCUS SESSIONS */}
-
         <div className="dashboard-stat">
 
           <span>
@@ -667,31 +593,6 @@ function Dashboard() {
 
         </div>
 
-
-        {/* BLOCKS */}
-
-        <div className="dashboard-stat">
-
-          <span>
-            🧱
-          </span>
-
-          <div>
-
-            <small>
-              BLOCKS MINED
-            </small>
-
-            <strong>
-              {blocks}
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        {/* WORLD */}
 
         <div className="dashboard-stat">
 
