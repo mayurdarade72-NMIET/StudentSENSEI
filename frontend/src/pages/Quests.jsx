@@ -6,153 +6,27 @@ function Quests() {
   const navigate = useNavigate();
 
   // =========================================
+  // BACKEND
+  // =========================================
+
+  const API_URL = "http://127.0.0.1:8000";
+
+  // =========================================
   // XP
   // =========================================
 
-  const getXP = () => {
-    const savedXP =
-      localStorage.getItem("studentSenseiXP");
-
-    return savedXP ? Number(savedXP) : 750;
-  };
-
-  const [xp, setXp] = useState(getXP);
+  const [xp, setXp] = useState(0);
 
   // =========================================
-  // DEFAULT DAILY QUESTS
+  // QUESTS
   // =========================================
 
-  const defaultQuests = [
-    {
-      id: 1,
-      title: "Complete 10 Math Problems",
-      description:
-        "Solve today's mathematics practice problems.",
-      icon: "⚔️",
-      xp: 100,
-      completed: false,
-    },
+  const [quests, setQuests] = useState([]);
 
-    {
-      id: 2,
-      title: "Study Physics Chapter",
-      description:
-        "Read and understand one physics chapter.",
-      icon: "📖",
-      xp: 150,
-      completed: false,
-    },
+  const [loading, setLoading] = useState(true);
 
-    {
-      id: 3,
-      title: "Practice Programming",
-      description:
-        "Practice Python for 45 minutes.",
-      icon: "💻",
-      xp: 200,
-      completed: false,
-    },
-
-    {
-      id: 4,
-      title: "Complete Focus Session",
-      description:
-        "Enter the Focus Mine and complete one session.",
-      icon: "⛏️",
-      xp: 100,
-      completed: false,
-    },
-  ];
-
-  // =========================================
-  // REAL DATE
-  // =========================================
-
-  const getToday = () => {
-    const date = new Date();
-
-    const year = date.getFullYear();
-    const month = String(
-      date.getMonth() + 1
-    ).padStart(2, "0");
-    const day = String(
-      date.getDate()
-    ).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
-  // =========================================
-  // LOAD DAILY QUESTS
-  // =========================================
-
-  const loadDailyQuests = () => {
-    const today = getToday();
-
-    const savedDate =
-      localStorage.getItem(
-        "studentSenseiQuestDate"
-      );
-
-    const savedQuests =
-      localStorage.getItem(
-        "studentSenseiQuests"
-      );
-
-    // -----------------------------------------
-    // NEW DAY
-    // -----------------------------------------
-
-    if (savedDate !== today) {
-      localStorage.setItem(
-        "studentSenseiQuestDate",
-        today
-      );
-
-      localStorage.setItem(
-        "studentSenseiQuests",
-        JSON.stringify(defaultQuests)
-      );
-
-      return defaultQuests;
-    }
-
-    // -----------------------------------------
-    // SAME DAY
-    // -----------------------------------------
-
-    if (savedQuests) {
-      try {
-        return JSON.parse(savedQuests);
-      } catch {
-        localStorage.setItem(
-          "studentSenseiQuests",
-          JSON.stringify(defaultQuests)
-        );
-
-        return defaultQuests;
-      }
-    }
-
-    // -----------------------------------------
-    // FIRST VISIT
-    // -----------------------------------------
-
-    localStorage.setItem(
-      "studentSenseiQuestDate",
-      today
-    );
-
-    localStorage.setItem(
-      "studentSenseiQuests",
-      JSON.stringify(defaultQuests)
-    );
-
-    return defaultQuests;
-  };
-
-  const [quests, setQuests] =
-    useState(loadDailyQuests);
+  const [backendError, setBackendError] =
+    useState(false);
 
   // =========================================
   // REWARD POPUP
@@ -162,106 +36,150 @@ function Quests() {
     useState(null);
 
   // =========================================
-  // CHECK FOR NEW DAY
+  // LOAD STUDENT
   // =========================================
 
-  useEffect(() => {
-    const checkNewDay = () => {
-      const savedDate =
-        localStorage.getItem(
-          "studentSenseiQuestDate"
+  const loadStudent = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/student`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to fetch student"
         );
-
-      const today = getToday();
-
-      if (savedDate !== today) {
-        const freshQuests =
-          defaultQuests.map(
-            (quest) => ({
-              ...quest,
-              completed: false,
-            })
-          );
-
-        localStorage.setItem(
-          "studentSenseiQuestDate",
-          today
-        );
-
-        localStorage.setItem(
-          "studentSenseiQuests",
-          JSON.stringify(freshQuests)
-        );
-
-        setQuests(freshQuests);
       }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(
+          "Student API returned an error"
+        );
+      }
+
+      setXp(data.student.xp || 0);
+
+      setBackendError(false);
+
+    } catch (error) {
+      console.error(
+        "Student API error:",
+        error
+      );
+
+      setBackendError(true);
+    }
+  };
+
+  // =========================================
+  // LOAD DAILY TASKS
+  // =========================================
+
+  const loadDailyTasks = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${API_URL}/api/daily-tasks`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to fetch daily tasks"
+        );
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(
+          "Daily tasks API returned an error"
+        );
+      }
+
+      // ---------------------------------------
+      // Convert backend tasks into frontend
+      // quest objects.
+      // ---------------------------------------
+
+      const formattedTasks =
+        data.tasks.map((task) => ({
+          id: task.id,
+
+          title:
+            task.task_text,
+
+          description:
+            "Complete today's learning task.",
+
+          icon: "⚔️",
+
+          xp:
+            task.xp_reward,
+
+          completed:
+            Boolean(task.completed),
+
+          taskDate:
+            task.task_date,
+        }));
+
+      setQuests(formattedTasks);
+
+      setBackendError(false);
+
+    } catch (error) {
+      console.error(
+        "Daily tasks API error:",
+        error
+      );
+
+      setBackendError(true);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =========================================
+  // INITIAL LOAD
+  // =========================================
+
+  useEffect(() => {
+    loadStudent();
+    loadDailyTasks();
+  }, []);
+
+  // =========================================
+  // REFRESH DATA WHEN RETURNING
+  // =========================================
+
+  useEffect(() => {
+    const handleFocus = () => {
+      loadStudent();
+      loadDailyTasks();
     };
 
-    checkNewDay();
-
-    // Check when user returns to the tab
     window.addEventListener(
       "focus",
-      checkNewDay
-    );
-
-    // Also check periodically so the reset
-    // can happen even if the page remains open.
-    const interval = setInterval(
-      checkNewDay,
-      60000
+      handleFocus
     );
 
     return () => {
       window.removeEventListener(
         "focus",
-        checkNewDay
-      );
-
-      clearInterval(interval);
-    };
-  }, []);
-
-  // =========================================
-  // SYNC XP
-  // =========================================
-
-  useEffect(() => {
-    const syncXP = () => {
-      setXp(getXP());
-    };
-
-    syncXP();
-
-    window.addEventListener(
-      "focus",
-      syncXP
-    );
-
-    return () => {
-      window.removeEventListener(
-        "focus",
-        syncXP
+        handleFocus
       );
     };
   }, []);
-
-  // =========================================
-  // SAVE QUESTS
-  // =========================================
-
-  useEffect(() => {
-    localStorage.setItem(
-      "studentSenseiQuests",
-      JSON.stringify(quests)
-    );
-  }, [quests]);
 
   // =========================================
   // COMPLETE QUEST
   // =========================================
 
-  const completeQuest = (questId) => {
+  const completeQuest = async (questId) => {
     const quest = quests.find(
       (item) => item.id === questId
     );
@@ -270,69 +188,42 @@ function Quests() {
       return;
     }
 
-    // -----------------------------------------
-    // ADD XP
-    // -----------------------------------------
-
-    const currentXP = getXP();
-
-    const newXP =
-      currentXP + quest.xp;
-
-    localStorage.setItem(
-      "studentSenseiXP",
-      String(newXP)
-    );
-
-    setXp(newXP);
-
-    // -----------------------------------------
-    // MARK QUEST COMPLETE
-    // -----------------------------------------
+    // =======================================
+    // TEMPORARY FRONTEND COMPLETION
+    // =======================================
 
     const updatedQuests =
-      quests.map(
-        (item) =>
-          item.id === questId
-            ? {
-                ...item,
-                completed: true,
-              }
-            : item
+      quests.map((item) =>
+        item.id === questId
+          ? {
+              ...item,
+              completed: true,
+            }
+          : item
       );
 
     setQuests(updatedQuests);
 
-    // -----------------------------------------
-    // TOTAL COMPLETED QUESTS
-    // -----------------------------------------
-
-    const totalCompleted =
-      Number(
-        localStorage.getItem(
-          "studentSenseiCompletedQuests"
-        )
-      ) || 0;
-
-    localStorage.setItem(
-      "studentSenseiCompletedQuests",
-      String(
-        totalCompleted + 1
-      )
-    );
-
-    // -----------------------------------------
+    // =======================================
     // SHOW REWARD
-    // -----------------------------------------
+    // =======================================
 
     setReward({
       title: quest.title,
       xp: quest.xp,
     });
 
-    // -----------------------------------------
+    // =======================================
+    // REFRESH STUDENT DATA
+    // =======================================
+
+    setTimeout(() => {
+      loadStudent();
+    }, 500);
+
+    // =======================================
     // CLOSE REWARD
-    // -----------------------------------------
+    // =======================================
 
     setTimeout(() => {
       setReward(null);
@@ -363,6 +254,7 @@ function Quests() {
     return Array.from({
       length: 500,
     }).map((_, index) => {
+
       const fromLeft =
         index % 2 === 0;
 
@@ -405,10 +297,62 @@ function Quests() {
               0.6
             }`,
           }}
-        ></span>
+        />
       );
     });
   };
+
+  // =========================================
+  // LOADING
+  // =========================================
+
+  if (loading) {
+    return (
+      <div className="quests-page">
+
+        <nav className="quests-navbar">
+
+          <div className="quests-logo">
+            Student<span>SENSEI</span>
+          </div>
+
+          <div className="quest-player-info">
+
+            <span>
+              ⭐ Loading XP...
+            </span>
+
+            <button
+              onClick={() =>
+                navigate("/dashboard")
+              }
+            >
+              ← Dashboard
+            </button>
+
+          </div>
+
+        </nav>
+
+        <header className="quests-header">
+
+          <p>
+            ⚔️ DAILY ADVENTURES
+          </p>
+
+          <h1>
+            Loading Quests...
+          </h1>
+
+          <span>
+            Connecting to StudentSENSEI backend.
+          </span>
+
+        </header>
+
+      </div>
+    );
+  }
 
   // =========================================
   // RENDER
@@ -444,6 +388,35 @@ function Quests() {
         </div>
 
       </nav>
+
+
+      {/* =====================================
+          BACKEND STATUS
+      ===================================== */}
+
+      <div
+        style={{
+          position: "fixed",
+          top: "10px",
+          right: "10px",
+          zIndex: 9999,
+          padding: "8px 14px",
+          borderRadius: "8px",
+          background:
+            backendError
+              ? "#ef4444"
+              : "#22c55e",
+          color: "white",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow:
+            "0 4px 12px rgba(0,0,0,0.2)",
+        }}
+      >
+        {backendError
+          ? "Backend error"
+          : "Backend connected"}
+      </div>
 
 
       {/* =====================================
@@ -493,7 +466,7 @@ function Quests() {
               width:
                 `${progressPercent}%`,
             }}
-          ></div>
+          />
 
         </div>
 
@@ -506,60 +479,83 @@ function Quests() {
 
       <main className="quest-list">
 
-        {quests.map((quest) => (
+        {quests.length === 0 ? (
 
-          <article
-            key={quest.id}
-            className={`quest-card ${
-              quest.completed
-                ? "completed"
-                : ""
-            }`}
-          >
+          <div className="all-quests-complete">
 
-            <div className="quest-icon">
-              {quest.icon}
+            <div>
+              📭
             </div>
 
-            <div className="quest-details">
+            <h2>
+              No Quests Available
+            </h2>
 
-              <div className="quest-title-row">
+            <p>
+              Your Sensei hasn't assigned any
+              quests yet.
+            </p>
 
-                <h2>
-                  {quest.title}
-                </h2>
+          </div>
 
-                <span>
-                  +{quest.xp} XP
-                </span>
+        ) : (
+
+          quests.map((quest) => (
+
+            <article
+              key={quest.id}
+              className={`quest-card ${
+                quest.completed
+                  ? "completed"
+                  : ""
+              }`}
+            >
+
+              <div className="quest-icon">
+                {quest.icon}
+              </div>
+
+              <div className="quest-details">
+
+                <div className="quest-title-row">
+
+                  <h2>
+                    {quest.title}
+                  </h2>
+
+                  <span>
+                    +{quest.xp} XP
+                  </span>
+
+                </div>
+
+                <p>
+                  {quest.description}
+                </p>
 
               </div>
 
-              <p>
-                {quest.description}
-              </p>
+              <button
+                className="complete-quest-button"
+                disabled={
+                  quest.completed
+                }
+                onClick={() =>
+                  completeQuest(
+                    quest.id
+                  )
+                }
+              >
+                {quest.completed
+                  ? "✓ COMPLETED"
+                  : "COMPLETE"}
+              </button>
 
-            </div>
+            </article>
 
-            <button
-              className="complete-quest-button"
-              disabled={
-                quest.completed
-              }
-              onClick={() =>
-                completeQuest(
-                  quest.id
-                )
-              }
-            >
-              {quest.completed
-                ? "✓ COMPLETED"
-                : "COMPLETE"}
-            </button>
+          ))
 
-          </article>
-
-        ))}
+        )}
 
       </main>
 
@@ -568,8 +564,9 @@ function Quests() {
           ALL QUESTS COMPLETE
       ===================================== */}
 
-      {completedCount ===
-        quests.length && (
+      {quests.length > 0 &&
+        completedCount ===
+          quests.length && (
 
         <section className="all-quests-complete">
 

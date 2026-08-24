@@ -6,13 +6,16 @@ function Dashboard() {
   const navigate = useNavigate();
 
   // =========================================
-  // PLAYER DATA
+  // BACKEND STUDENT DATA
   // =========================================
 
-  const getXP = () => {
-    const savedXP = localStorage.getItem("studentSenseiXP");
-    return savedXP ? Number(savedXP) : 750;
-  };
+  const [student, setStudent] = useState(null);
+  const [backendLoading, setBackendLoading] = useState(true);
+  const [backendError, setBackendError] = useState(false);
+
+  // =========================================
+  // LOCAL DATA
+  // =========================================
 
   const getCompletedQuests = () => {
     const saved = localStorage.getItem(
@@ -30,44 +33,118 @@ function Dashboard() {
     return saved ? Number(saved) : 0;
   };
 
-  const [xp, setXp] = useState(getXP());
   const [completedQuests, setCompletedQuests] =
     useState(getCompletedQuests());
-  const [sessions, setSessions] = useState(getSessions());
+
+  const [sessions, setSessions] =
+    useState(getSessions());
 
   // =========================================
-  // SYNC DATA
+  // FETCH STUDENT FROM BACKEND
+  // =========================================
+
+  const fetchStudent = async () => {
+    try {
+      setBackendLoading(true);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/student"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch student");
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error("Backend returned an error");
+      }
+
+      setStudent(data.student);
+      setBackendError(false);
+
+    } catch (error) {
+      console.error(
+        "Student API error:",
+        error
+      );
+
+      setBackendError(true);
+
+    } finally {
+      setBackendLoading(false);
+    }
+  };
+
+  // =========================================
+  // LOAD DATA
   // =========================================
 
   useEffect(() => {
-    const syncData = () => {
-      setXp(getXP());
-      setCompletedQuests(getCompletedQuests());
-      setSessions(getSessions());
+    fetchStudent();
+
+    const syncLocalData = () => {
+      setCompletedQuests(
+        getCompletedQuests()
+      );
+
+      setSessions(
+        getSessions()
+      );
     };
 
-    syncData();
+    syncLocalData();
 
-    window.addEventListener("focus", syncData);
+    window.addEventListener(
+      "focus",
+      syncLocalData
+    );
 
     return () => {
-      window.removeEventListener("focus", syncData);
+      window.removeEventListener(
+        "focus",
+        syncLocalData
+      );
     };
   }, []);
 
   // =========================================
-  // PLAYER LEVEL
+  // PLAYER DATA
   // =========================================
 
-  const level = Math.floor(xp / 250) + 1;
+  const xp = student?.xp ?? 0;
 
-  const levelStartXP = (level - 1) * 250;
-  const levelEndXP = level * 250;
+  const level =
+    student?.level ??
+    Math.floor(xp / 250) + 1;
+
+  const playerName =
+    student?.name ?? "Student";
+
+  const coins =
+    student?.coins ?? 0;
+
+  const backendWorld =
+    student?.current_world ?? "Starting Land";
+
+  // =========================================
+  // LEVEL PROGRESS
+  // =========================================
+
+  const levelStartXP =
+    (level - 1) * 250;
+
+  const levelEndXP =
+    level * 250;
 
   const levelProgress = Math.min(
-    ((xp - levelStartXP) /
-      (levelEndXP - levelStartXP)) *
-      100,
+    Math.max(
+      ((xp - levelStartXP) /
+        (levelEndXP - levelStartXP)) *
+        100,
+      0
+    ),
     100
   );
 
@@ -75,12 +152,19 @@ function Dashboard() {
   // WORLD
   // =========================================
 
-  let worldName = "Starting Land";
+  let worldName = backendWorld;
 
-  if (xp >= 900) {
-    worldName = "Village";
-  } else if (xp >= 800) {
-    worldName = "Growing Forest";
+  // Keep existing world progression
+  // as a fallback if backend world is empty.
+
+  if (!student?.current_world) {
+    worldName = "Starting Land";
+
+    if (xp >= 900) {
+      worldName = "Village";
+    } else if (xp >= 800) {
+      worldName = "Growing Forest";
+    }
   }
 
   // =========================================
@@ -88,20 +172,26 @@ function Dashboard() {
   // =========================================
 
   const savedQuests =
-    localStorage.getItem("studentSenseiQuests");
+    localStorage.getItem(
+      "studentSenseiQuests"
+    );
 
   const quests = savedQuests
     ? JSON.parse(savedQuests)
     : [];
 
-  const todayCompleted = quests.filter(
-    (quest) => quest.completed
-  ).length;
+  const todayCompleted =
+    quests.filter(
+      (quest) => quest.completed
+    ).length;
 
-  const totalQuests = quests.length || 4;
+  const totalQuests =
+    quests.length || 4;
 
   const questProgress =
-    (todayCompleted / totalQuests) * 100;
+    totalQuests > 0
+      ? (todayCompleted / totalQuests) * 100
+      : 0;
 
   // =========================================
   // RENDER
@@ -123,13 +213,17 @@ function Dashboard() {
         <div className="dashboard-nav-actions">
 
           <button
-            onClick={() => navigate("/quests")}
+            onClick={() =>
+              navigate("/quests")
+            }
           >
             ⚔️ Quests
           </button>
 
           <button
-            onClick={() => navigate("/world")}
+            onClick={() =>
+              navigate("/world")
+            }
           >
             🌍 World
           </button>
@@ -145,6 +239,38 @@ function Dashboard() {
         </div>
 
       </nav>
+
+
+      {/* =====================================
+          BACKEND STATUS
+      ===================================== */}
+
+      <div
+        style={{
+          position: "fixed",
+          top: "10px",
+          right: "10px",
+          zIndex: 9999,
+          padding: "8px 14px",
+          borderRadius: "8px",
+          background: backendLoading
+            ? "#f59e0b"
+            : backendError
+            ? "#ef4444"
+            : "#22c55e",
+          color: "white",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow:
+            "0 4px 12px rgba(0,0,0,0.2)",
+        }}
+      >
+        {backendLoading
+          ? "Loading student..."
+          : backendError
+          ? "Backend error"
+          : "Backend connected"}
+      </div>
 
 
       {/* =====================================
@@ -164,8 +290,9 @@ function Dashboard() {
           </h1>
 
           <p className="dashboard-subtitle">
-            Complete quests, focus your mind,
-            and build your world.
+            Welcome back, {playerName}. Complete
+            quests, focus your mind, and build
+            your world.
           </p>
 
         </div>
@@ -222,7 +349,11 @@ function Dashboard() {
         </div>
 
         <p>
-          {levelEndXP - xp} XP until Level{" "}
+          {Math.max(
+            levelEndXP - xp,
+            0
+          )}{" "}
+          XP until Level{" "}
           {level + 1}
         </p>
 
@@ -271,7 +402,9 @@ function Dashboard() {
           </div>
 
           <button
-            onClick={() => navigate("/quests")}
+            onClick={() =>
+              navigate("/quests")
+            }
           >
             View Quests →
           </button>
@@ -304,7 +437,9 @@ function Dashboard() {
           </div>
 
           <button
-            onClick={() => navigate("/focus")}
+            onClick={() =>
+              navigate("/focus")
+            }
           >
             Start Focus →
           </button>
@@ -337,7 +472,9 @@ function Dashboard() {
           </div>
 
           <button
-            onClick={() => navigate("/world")}
+            onClick={() =>
+              navigate("/world")
+            }
           >
             Explore →
           </button>
@@ -396,6 +533,7 @@ function Dashboard() {
           </span>
 
           <div>
+
             <small>
               TOTAL XP
             </small>
@@ -403,6 +541,7 @@ function Dashboard() {
             <strong>
               {xp}
             </strong>
+
           </div>
 
         </div>
@@ -415,6 +554,7 @@ function Dashboard() {
           </span>
 
           <div>
+
             <small>
               QUESTS COMPLETED
             </small>
@@ -422,6 +562,7 @@ function Dashboard() {
             <strong>
               {completedQuests}
             </strong>
+
           </div>
 
         </div>
@@ -434,6 +575,7 @@ function Dashboard() {
           </span>
 
           <div>
+
             <small>
               FOCUS SESSIONS
             </small>
@@ -441,6 +583,7 @@ function Dashboard() {
             <strong>
               {sessions}
             </strong>
+
           </div>
 
         </div>
@@ -453,6 +596,7 @@ function Dashboard() {
           </span>
 
           <div>
+
             <small>
               CURRENT WORLD
             </small>
@@ -460,6 +604,7 @@ function Dashboard() {
             <strong>
               {worldName}
             </strong>
+
           </div>
 
         </div>
@@ -496,7 +641,9 @@ function Dashboard() {
         </div>
 
         <button
-          onClick={() => navigate("/quests")}
+          onClick={() =>
+            navigate("/quests")
+          }
         >
           Begin Adventure ⚔️
         </button>

@@ -89,5 +89,3 @@ function EmailLogin() {
     </div>
   );
 }
-
-export default EmailLogin;
