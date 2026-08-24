@@ -33,11 +33,33 @@ function Dashboard() {
     return saved ? Number(saved) : 0;
   };
 
+  const getBlocks = () => {
+    const saved = localStorage.getItem(
+      "studentSenseiBlocks"
+    );
+
+    return saved ? Number(saved) : 0;
+  };
+
+  const getLocalXP = () => {
+    const saved = localStorage.getItem(
+      "studentSenseiXP"
+    );
+
+    return saved ? Number(saved) : null;
+  };
+
   const [completedQuests, setCompletedQuests] =
     useState(getCompletedQuests());
 
   const [sessions, setSessions] =
     useState(getSessions());
+
+  const [blocks, setBlocks] =
+    useState(getBlocks());
+
+  const [localXP, setLocalXP] =
+    useState(getLocalXP());
 
   // =========================================
   // FETCH STUDENT FROM BACKEND
@@ -78,32 +100,57 @@ function Dashboard() {
   };
 
   // =========================================
+  // SYNC LOCAL DATA
+  // =========================================
+
+  const syncLocalData = () => {
+    setCompletedQuests(
+      getCompletedQuests()
+    );
+
+    setSessions(
+      getSessions()
+    );
+
+    setBlocks(
+      getBlocks()
+    );
+
+    setLocalXP(
+      getLocalXP()
+    );
+  };
+
+  // =========================================
   // LOAD DATA
   // =========================================
 
   useEffect(() => {
     fetchStudent();
-
-    const syncLocalData = () => {
-      setCompletedQuests(
-        getCompletedQuests()
-      );
-
-      setSessions(
-        getSessions()
-      );
-    };
-
     syncLocalData();
 
+    // Refresh when returning from Focus,
+    // Quests, or another page.
     window.addEventListener(
       "focus",
+      syncLocalData
+    );
+
+    // Also react to localStorage changes
+    // from another browser tab.
+    window.addEventListener(
+      "storage",
       syncLocalData
     );
 
     return () => {
       window.removeEventListener(
         "focus",
+        syncLocalData
+      );
+
+      window.removeEventListener(
+        "storage",
         syncLocalData
       );
     };
@@ -113,7 +160,17 @@ function Dashboard() {
   // PLAYER DATA
   // =========================================
 
-  const xp = student?.xp ?? 0;
+  /*
+    Focus sessions store XP in localStorage.
+
+    If local XP exists, use it.
+    Otherwise use the backend XP.
+  */
+
+  const xp =
+    localXP !== null
+      ? localXP
+      : student?.xp ?? 750;
 
   const level =
     student?.level ??
@@ -154,9 +211,6 @@ function Dashboard() {
 
   let worldName = backendWorld;
 
-  // Keep existing world progression
-  // as a fallback if backend world is empty.
-
   if (!student?.current_world) {
     worldName = "Starting Land";
 
@@ -176,9 +230,20 @@ function Dashboard() {
       "studentSenseiQuests"
     );
 
-  const quests = savedQuests
-    ? JSON.parse(savedQuests)
-    : [];
+  let quests = [];
+
+  try {
+    quests = savedQuests
+      ? JSON.parse(savedQuests)
+      : [];
+  } catch (error) {
+    console.error(
+      "Quest data error:",
+      error
+    );
+
+    quests = [];
+  }
 
   const todayCompleted =
     quests.filter(
@@ -366,7 +431,9 @@ function Dashboard() {
 
       <main className="dashboard-grid">
 
-        {/* QUESTS */}
+        {/* ===================================
+            QUESTS
+        =================================== */}
 
         <article className="dashboard-card quests-card">
 
@@ -412,7 +479,9 @@ function Dashboard() {
         </article>
 
 
-        {/* FOCUS */}
+        {/* ===================================
+            FOCUS
+        =================================== */}
 
         <article className="dashboard-card focus-card">
 
@@ -447,7 +516,9 @@ function Dashboard() {
         </article>
 
 
-        {/* WORLD */}
+        {/* ===================================
+            WORLD
+        =================================== */}
 
         <article className="dashboard-card world-card">
 
@@ -482,7 +553,9 @@ function Dashboard() {
         </article>
 
 
-        {/* ACHIEVEMENTS */}
+        {/* ===================================
+            ACHIEVEMENTS
+        =================================== */}
 
         <article className="dashboard-card achievement-card">
 
@@ -526,6 +599,8 @@ function Dashboard() {
 
       <section className="dashboard-stats">
 
+        {/* TOTAL XP */}
+
         <div className="dashboard-stat">
 
           <span>
@@ -546,6 +621,8 @@ function Dashboard() {
 
         </div>
 
+
+        {/* QUESTS */}
 
         <div className="dashboard-stat">
 
@@ -568,6 +645,8 @@ function Dashboard() {
         </div>
 
 
+        {/* FOCUS SESSIONS */}
+
         <div className="dashboard-stat">
 
           <span>
@@ -588,6 +667,31 @@ function Dashboard() {
 
         </div>
 
+
+        {/* BLOCKS */}
+
+        <div className="dashboard-stat">
+
+          <span>
+            🧱
+          </span>
+
+          <div>
+
+            <small>
+              BLOCKS MINED
+            </small>
+
+            <strong>
+              {blocks}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        {/* WORLD */}
 
         <div className="dashboard-stat">
 

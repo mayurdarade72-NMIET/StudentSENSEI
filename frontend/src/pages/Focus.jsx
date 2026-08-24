@@ -9,19 +9,41 @@ function Focus() {
   // SESSION SETTINGS
   // =========================================
 
-  // TEST MODE: 10 seconds
-  const TOTAL_TIME = 10;
+  // TEST DEFAULT: 1 minute
+  // Change this later if needed.
+  const DEFAULT_DURATION = 1;
 
-  // XP earned after completing session
-  const SESSION_XP = 100;
+  // Custom duration limits
+  const MIN_DURATION = 1;
+  const MAX_DURATION = 180;
+
+  // XP earned for every completed 30 minutes
+  const XP_PER_30_MINUTES = 5;
 
   // =========================================
   // TIMER STATE
   // =========================================
 
-  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [selectedDuration, setSelectedDuration] =
+    useState(DEFAULT_DURATION);
+
+  const [customMinutes, setCustomMinutes] =
+    useState(String(DEFAULT_DURATION));
+
+  const [timeLeft, setTimeLeft] = useState(
+    DEFAULT_DURATION * 60
+  );
+
   const [isRunning, setIsRunning] = useState(false);
   const [completed, setCompleted] = useState(false);
+
+  // =========================================
+  // CALCULATE SESSION XP
+  // =========================================
+
+  const sessionXP =
+    Math.floor(selectedDuration / 30) *
+    XP_PER_30_MINUTES;
 
   // =========================================
   // MINING STATE
@@ -35,6 +57,86 @@ function Focus() {
     (blocks / maxBlocks) * 100,
     100
   );
+
+  // =========================================
+  // CHANGE SESSION DURATION
+  // =========================================
+
+  const changeDuration = (minutes) => {
+    if (isRunning || completed) {
+      return;
+    }
+
+    const safeMinutes = Math.min(
+      Math.max(minutes, MIN_DURATION),
+      MAX_DURATION
+    );
+
+    setSelectedDuration(safeMinutes);
+    setCustomMinutes(String(safeMinutes));
+    setTimeLeft(safeMinutes * 60);
+  };
+
+  // =========================================
+  // CUSTOM MINUTES
+  // =========================================
+
+  const handleCustomMinutesChange = (event) => {
+    if (isRunning || completed) {
+      return;
+    }
+
+    const value = event.target.value;
+
+    if (value === "") {
+      setCustomMinutes("");
+      return;
+    }
+
+    if (!/^\d+$/.test(value)) {
+      return;
+    }
+
+    let minutes = Number(value);
+
+    if (minutes > MAX_DURATION) {
+      minutes = MAX_DURATION;
+    }
+
+    setCustomMinutes(String(minutes));
+
+    if (minutes >= MIN_DURATION) {
+      setSelectedDuration(minutes);
+      setTimeLeft(minutes * 60);
+    }
+  };
+
+  // =========================================
+  // CUSTOM INPUT BLUR
+  // =========================================
+
+  const handleCustomMinutesBlur = () => {
+    if (isRunning || completed) {
+      return;
+    }
+
+    let minutes = Number(customMinutes);
+
+    if (
+      !Number.isFinite(minutes) ||
+      minutes < MIN_DURATION
+    ) {
+      minutes = MIN_DURATION;
+    }
+
+    if (minutes > MAX_DURATION) {
+      minutes = MAX_DURATION;
+    }
+
+    setCustomMinutes(String(minutes));
+    setSelectedDuration(minutes);
+    setTimeLeft(minutes * 60);
+  };
 
   // =========================================
   // TIMER
@@ -73,35 +175,37 @@ function Focus() {
     }
 
     const alreadyRewarded =
-      sessionStorage.getItem("focusSessionRewarded");
+      sessionStorage.getItem(
+        "focusSessionRewarded"
+      );
 
     if (alreadyRewarded === "true") {
       return;
     }
 
-    // -----------------------------------------
+    // =========================================
     // GET CURRENT XP
-    // -----------------------------------------
+    // =========================================
 
     const currentXP =
       Number(
         localStorage.getItem("studentSenseiXP")
       ) || 750;
 
-    // -----------------------------------------
-    // ADD XP
-    // -----------------------------------------
+    // =========================================
+    // ADD DURATION-BASED XP
+    // =========================================
 
-    const newXP = currentXP + SESSION_XP;
+    const newXP = currentXP + sessionXP;
 
     localStorage.setItem(
       "studentSenseiXP",
       String(newXP)
     );
 
-    // -----------------------------------------
+    // =========================================
     // SAVE SESSION COUNT
-    // -----------------------------------------
+    // =========================================
 
     const sessions =
       Number(
@@ -115,9 +219,9 @@ function Focus() {
       String(sessions + 1)
     );
 
-    // -----------------------------------------
+    // =========================================
     // SAVE BLOCKS
-    // -----------------------------------------
+    // =========================================
 
     const totalBlocks =
       Number(
@@ -131,25 +235,29 @@ function Focus() {
       String(totalBlocks + blocks)
     );
 
-    // -----------------------------------------
+    // =========================================
     // PREVENT DUPLICATE REWARD
-    // -----------------------------------------
+    // =========================================
 
     sessionStorage.setItem(
       "focusSessionRewarded",
       "true"
     );
-  }, [completed, blocks]);
+  }, [completed, blocks, sessionXP]);
 
   // =========================================
   // TIMER FORMAT
   // =========================================
 
-  const minutes = Math.floor(timeLeft / 60)
+  const minutes = Math.floor(
+    timeLeft / 60
+  )
     .toString()
     .padStart(2, "0");
 
-  const seconds = (timeLeft % 60)
+  const seconds = (
+    timeLeft % 60
+  )
     .toString()
     .padStart(2, "0");
 
@@ -160,6 +268,13 @@ function Focus() {
   const startMining = () => {
     if (completed) {
       return;
+    }
+
+    if (
+      !selectedDuration ||
+      selectedDuration < MIN_DURATION
+    ) {
+      changeDuration(MIN_DURATION);
     }
 
     setIsRunning(true);
@@ -201,7 +316,7 @@ function Focus() {
       "focusSessionRewarded"
     );
 
-    setTimeLeft(TOTAL_TIME);
+    setTimeLeft(selectedDuration * 60);
     setBlocks(0);
     setIsRunning(false);
     setCompleted(false);
@@ -239,7 +354,9 @@ function Focus() {
           </span>
 
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() =>
+              navigate("/dashboard")
+            }
           >
             ← Dashboard
           </button>
@@ -272,7 +389,7 @@ function Focus() {
 
 
       {/* =====================================
-          MINE AREA
+          MAIN MINE
       ===================================== */}
 
       <main className="mine-container">
@@ -320,6 +437,134 @@ function Focus() {
             ⛏️ MINING SESSION
           </p>
 
+          {/* =================================
+              SESSION DURATION
+          ================================= */}
+
+          {!isRunning && !completed && (
+
+            <div className="duration-selector">
+
+              <p className="duration-label">
+                SESSION DURATION
+              </p>
+
+              <div className="duration-buttons">
+
+                <button
+                  type="button"
+                  className={
+                    selectedDuration === 15
+                      ? "duration-button active"
+                      : "duration-button"
+                  }
+                  onClick={() =>
+                    changeDuration(15)
+                  }
+                >
+                  15m
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    selectedDuration === 30
+                      ? "duration-button active"
+                      : "duration-button"
+                  }
+                  onClick={() =>
+                    changeDuration(30)
+                  }
+                >
+                  30m
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    selectedDuration === 45
+                      ? "duration-button active"
+                      : "duration-button"
+                  }
+                  onClick={() =>
+                    changeDuration(45)
+                  }
+                >
+                  45m
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    selectedDuration === 60
+                      ? "duration-button active"
+                      : "duration-button"
+                  }
+                  onClick={() =>
+                    changeDuration(60)
+                  }
+                >
+                  60m
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    selectedDuration === 90
+                      ? "duration-button active"
+                      : "duration-button"
+                  }
+                  onClick={() =>
+                    changeDuration(90)
+                  }
+                >
+                  90m
+                </button>
+
+              </div>
+
+              {/* =================================
+                  CUSTOM DURATION
+              ================================= */}
+
+              <div className="custom-duration">
+
+                <label htmlFor="customMinutes">
+                  Custom minutes
+                </label>
+
+                <input
+                  id="customMinutes"
+                  type="number"
+                  min={MIN_DURATION}
+                  max={MAX_DURATION}
+                  step="1"
+                  value={customMinutes}
+                  onChange={
+                    handleCustomMinutesChange
+                  }
+                  onBlur={
+                    handleCustomMinutesBlur
+                  }
+                  disabled={
+                    isRunning || completed
+                  }
+                />
+
+              </div>
+
+              <small className="duration-help">
+                Choose between 1 and 180 minutes
+              </small>
+
+            </div>
+
+          )}
+
+          {/* =================================
+              TIMER
+          ================================= */}
+
           <div className="timer">
             {minutes}:{seconds}
           </div>
@@ -334,7 +579,6 @@ function Focus() {
 
           </p>
 
-
           {/* START */}
 
           {!isRunning && !completed && (
@@ -348,7 +592,6 @@ function Focus() {
 
           )}
 
-
           {/* MINE BLOCK */}
 
           {isRunning && (
@@ -361,7 +604,6 @@ function Focus() {
             </button>
 
           )}
-
 
           {/* END SESSION */}
 
@@ -405,7 +647,6 @@ function Focus() {
 
           </div>
 
-
           <div className="blocks-progress">
 
             <div
@@ -433,7 +674,7 @@ function Focus() {
             </span>
 
             <strong>
-              +{SESSION_XP} XP
+              +{sessionXP} XP
             </strong>
 
             <small>
@@ -441,7 +682,6 @@ function Focus() {
             </small>
 
           </div>
-
 
           <div className="reward-card">
 
@@ -459,7 +699,6 @@ function Focus() {
 
           </div>
 
-
           <div className="reward-card">
 
             <span>
@@ -475,7 +714,6 @@ function Focus() {
             </small>
 
           </div>
-
 
           <div className="reward-card">
 
@@ -506,14 +744,12 @@ function Focus() {
 
         <div className="completion-overlay">
 
-          {/* =================================
-              500 CONFETTI PIECES
-          ================================= */}
+          {/* CONFETTI */}
 
           <div className="confetti-container">
 
             {Array.from({
-              length: 500
+              length: 500,
             }).map(
               (_, index) => (
 
@@ -533,9 +769,7 @@ function Focus() {
           </div>
 
 
-          {/* =================================
-              COMPLETION POPUP
-          ================================= */}
+          {/* COMPLETION POPUP */}
 
           <div className="completion-popup">
 
@@ -558,9 +792,30 @@ function Focus() {
             </p>
 
 
-            {/* REWARDS */}
+            {/* COMPLETION REWARDS */}
 
             <div className="completion-rewards">
+
+              {/* SESSION DURATION */}
+
+              <div>
+
+                <span>
+                  ⏱️
+                </span>
+
+                <strong>
+                  {selectedDuration} min
+                </strong>
+
+                <small>
+                  Duration
+                </small>
+
+              </div>
+
+
+              {/* XP */}
 
               <div>
 
@@ -569,11 +824,17 @@ function Focus() {
                 </span>
 
                 <strong>
-                  +{SESSION_XP} XP
+                  +{sessionXP} XP
                 </strong>
+
+                <small>
+                  XP Earned
+                </small>
 
               </div>
 
+
+              {/* BLOCKS */}
 
               <div>
 
@@ -582,8 +843,12 @@ function Focus() {
                 </span>
 
                 <strong>
-                  {blocks} Blocks
+                  {blocks}
                 </strong>
+
+                <small>
+                  Blocks Mined
+                </small>
 
               </div>
 
