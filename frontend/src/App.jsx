@@ -53,31 +53,48 @@ function App() {
       });
   }, []);
 
+  const backendConnected =
+    backendStatus ===
+    "Backend connected successfully";
+
   return (
     <BrowserRouter>
 
       {/* =====================================
-          TEMPORARY BACKEND STATUS
+          BACKEND STATUS
       ===================================== */}
 
       <div
         style={{
           position: "fixed",
-          top: "10px",
-          right: "10px",
+          top: "18px",
+          right: "18px",
           zIndex: 9999,
-          padding: "8px 14px",
-          borderRadius: "8px",
-          background:
-            backendStatus ===
-            "Backend connected successfully"
-              ? "#22c55e"
-              : "#f59e0b",
+
+          padding: "9px 15px",
+
+          borderRadius: "10px",
+
+          background: backendConnected
+            ? "#22c55e"
+            : "#f59e0b",
+
           color: "white",
+
           fontSize: "12px",
+
           fontWeight: "700",
+
           boxShadow:
-            "0 4px 12px rgba(0,0,0,0.2)",
+            "0 6px 18px rgba(0,0,0,0.3)",
+
+          border: "1px solid rgba(255,255,255,0.15)",
+
+          maxWidth: "220px",
+
+          textAlign: "center",
+
+          pointerEvents: "none",
         }}
       >
         {backendStatus}

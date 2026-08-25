@@ -9,7 +9,7 @@ function Focus() {
   // SESSION SETTINGS
   // =========================================
 
-  const DEFAULT_DURATION = 1;
+  const DEFAULT_DURATION = 25;
   const MIN_DURATION = 1;
   const MAX_DURATION = 180;
 
@@ -32,14 +32,6 @@ function Focus() {
   const [completed, setCompleted] = useState(false);
 
   // =========================================
-  // SESSION XP PREVIEW
-  // =========================================
-
-  const sessionXP =
-    Math.floor(selectedDuration / 30) *
-    XP_PER_30_MINUTES;
-
-  // =========================================
   // MINING STATE
   // =========================================
 
@@ -47,13 +39,34 @@ function Focus() {
 
   const maxBlocks = 100;
 
+  const totalSeconds = selectedDuration * 60;
+
+  const elapsedSeconds =
+    Math.max(totalSeconds - timeLeft, 0);
+
+  const sessionProgress =
+    totalSeconds > 0
+      ? Math.min(
+          (elapsedSeconds / totalSeconds) * 100,
+          100
+        )
+      : 0;
+
   const miningProgress = Math.min(
     (blocks / maxBlocks) * 100,
     100
   );
 
   // =========================================
-  // CHANGE SESSION DURATION
+  // XP
+  // =========================================
+
+  const sessionXP =
+    Math.floor(selectedDuration / 30) *
+    XP_PER_30_MINUTES;
+
+  // =========================================
+  // CHANGE DURATION
   // =========================================
 
   const changeDuration = (minutes) => {
@@ -69,10 +82,11 @@ function Focus() {
     setSelectedDuration(safeMinutes);
     setCustomMinutes(String(safeMinutes));
     setTimeLeft(safeMinutes * 60);
+    setBlocks(0);
   };
 
   // =========================================
-  // CUSTOM MINUTES
+  // CUSTOM DURATION
   // =========================================
 
   const handleCustomMinutesChange = (event) => {
@@ -102,6 +116,7 @@ function Focus() {
     if (minutes >= MIN_DURATION) {
       setSelectedDuration(minutes);
       setTimeLeft(minutes * 60);
+      setBlocks(0);
     }
   };
 
@@ -130,6 +145,7 @@ function Focus() {
     setCustomMinutes(String(minutes));
     setSelectedDuration(minutes);
     setTimeLeft(minutes * 60);
+    setBlocks(0);
   };
 
   // =========================================
@@ -149,6 +165,10 @@ function Focus() {
           setIsRunning(false);
           setCompleted(true);
 
+          setBlocks((current) =>
+            Math.max(current, maxBlocks)
+          );
+
           return 0;
         }
 
@@ -158,6 +178,39 @@ function Focus() {
 
     return () => clearInterval(timer);
   }, [isRunning, completed]);
+
+  // =========================================
+  // AUTO MINING PROGRESS
+  // =========================================
+
+  useEffect(() => {
+    if (!isRunning || completed) {
+      return;
+    }
+
+    const blockTimer = setInterval(() => {
+      setBlocks((previous) => {
+        if (previous >= maxBlocks) {
+          return previous;
+        }
+
+        const expectedBlocks = Math.floor(
+          sessionProgress
+        );
+
+        return Math.max(
+          previous,
+          Math.min(expectedBlocks, maxBlocks)
+        );
+      });
+    }, 1000);
+
+    return () => clearInterval(blockTimer);
+  }, [
+    isRunning,
+    completed,
+    sessionProgress,
+  ]);
 
   // =========================================
   // SESSION COMPLETION
@@ -235,7 +288,7 @@ function Focus() {
     .padStart(2, "0");
 
   // =========================================
-  // START MINING
+  // START
   // =========================================
 
   const startMining = () => {
@@ -254,6 +307,14 @@ function Focus() {
   };
 
   // =========================================
+  // PAUSE
+  // =========================================
+
+  const pauseMining = () => {
+    setIsRunning(false);
+  };
+
+  // =========================================
   // END SESSION
   // =========================================
 
@@ -263,25 +324,7 @@ function Focus() {
   };
 
   // =========================================
-  // MINE BLOCK
-  // =========================================
-
-  const mineBlock = () => {
-    if (!isRunning || completed) {
-      return;
-    }
-
-    setBlocks((previous) => {
-      if (previous >= maxBlocks) {
-        return previous;
-      }
-
-      return previous + 1;
-    });
-  };
-
-  // =========================================
-  // RESET SESSION
+  // RESET
   // =========================================
 
   const resetSession = () => {
@@ -296,11 +339,19 @@ function Focus() {
   };
 
   // =========================================
-  // CONTINUE ADVENTURE
+  // CONTINUE
   // =========================================
 
   const continueAdventure = () => {
     navigate("/dashboard");
+  };
+
+  // =========================================
+  // TIMER RING
+  // =========================================
+
+  const ringStyle = {
+    "--progress": `${sessionProgress}%`,
   };
 
   // =========================================
@@ -311,7 +362,7 @@ function Focus() {
     <div className="focus-page">
 
       {/* =====================================
-          NAVIGATION BAR
+          NAVBAR
       ===================================== */}
 
       <nav className="focus-navbar">
@@ -323,7 +374,7 @@ function Focus() {
         <div className="focus-nav-right">
 
           <span>
-            ⛏️ MINING SESSION
+            ⛏️ FOCUS MINE
           </span>
 
           <button
@@ -360,12 +411,27 @@ function Focus() {
       </section>
 
       {/* =====================================
-          MAIN MINE
+          MAIN
       ===================================== */}
 
       <main className="mine-container">
 
-        <div className="mine-background">
+        {/* ===================================
+            MINE SCENE
+        =================================== */}
+
+        <section className="mine-background">
+
+          <div className="mine-title">
+            <span>FOCUS MINE</span>
+            <strong>
+              {isRunning
+                ? "MINING IN PROGRESS"
+                : completed
+                ? "SESSION COMPLETE"
+                : "READY TO MINE"}
+            </strong>
+          </div>
 
           <div className="mine-rock rock-one">
             🪨
@@ -395,21 +461,29 @@ function Focus() {
             🛒
           </div>
 
-        </div>
+          <div className="mine-ore ore-one">
+            💎
+          </div>
 
-        {/* =================================
+          <div className="mine-ore ore-two">
+            💎
+          </div>
+
+          <div className="mine-floor" />
+
+        </section>
+
+        {/* ===================================
             TIMER PANEL
-        ================================= */}
+        =================================== */}
 
         <section className="timer-panel">
 
-          <p>
+          <p className="timer-panel-label">
             ⛏️ MINING SESSION
           </p>
 
-          {/* =================================
-              SESSION DURATION
-          ================================= */}
+          {/* DURATION */}
 
           {!isRunning && !completed && (
 
@@ -421,86 +495,34 @@ function Focus() {
 
               <div className="duration-buttons">
 
-                <button
-                  type="button"
-                  className={
-                    selectedDuration === 15
-                      ? "duration-button active"
-                      : "duration-button"
-                  }
-                  onClick={() =>
-                    changeDuration(15)
-                  }
-                >
-                  15m
-                </button>
+                {[15, 25, 30, 45, 60, 90].map(
+                  (duration) => (
 
-                <button
-                  type="button"
-                  className={
-                    selectedDuration === 30
-                      ? "duration-button active"
-                      : "duration-button"
-                  }
-                  onClick={() =>
-                    changeDuration(30)
-                  }
-                >
-                  30m
-                </button>
+                    <button
+                      key={duration}
+                      type="button"
+                      className={
+                        selectedDuration ===
+                        duration
+                          ? "duration-button active"
+                          : "duration-button"
+                      }
+                      onClick={() =>
+                        changeDuration(duration)
+                      }
+                    >
+                      {duration}m
+                    </button>
 
-                <button
-                  type="button"
-                  className={
-                    selectedDuration === 45
-                      ? "duration-button active"
-                      : "duration-button"
-                  }
-                  onClick={() =>
-                    changeDuration(45)
-                  }
-                >
-                  45m
-                </button>
-
-                <button
-                  type="button"
-                  className={
-                    selectedDuration === 60
-                      ? "duration-button active"
-                      : "duration-button"
-                  }
-                  onClick={() =>
-                    changeDuration(60)
-                  }
-                >
-                  60m
-                </button>
-
-                <button
-                  type="button"
-                  className={
-                    selectedDuration === 90
-                      ? "duration-button active"
-                      : "duration-button"
-                  }
-                  onClick={() =>
-                    changeDuration(90)
-                  }
-                >
-                  90m
-                </button>
+                  )
+                )}
 
               </div>
-
-              {/* =================================
-                  CUSTOM DURATION
-              ================================= */}
 
               <div className="custom-duration">
 
                 <label htmlFor="customMinutes">
-                  Custom minutes
+                  Custom
                 </label>
 
                 <input
@@ -521,6 +543,8 @@ function Focus() {
                   }
                 />
 
+                <span>minutes</span>
+
               </div>
 
               <small className="duration-help">
@@ -531,12 +555,33 @@ function Focus() {
 
           )}
 
-          {/* =================================
-              TIMER
-          ================================= */}
+          {/* TIMER */}
 
-          <div className="timer">
-            {minutes}:{seconds}
+          <div
+            className="timer-ring"
+            style={ringStyle}
+          >
+
+            <div className="timer-ring-inner">
+
+              <span className="timer-small-label">
+                {completed
+                  ? "COMPLETE"
+                  : isRunning
+                  ? "FOCUSING"
+                  : "READY"}
+              </span>
+
+              <div className="timer">
+                {minutes}:{seconds}
+              </div>
+
+              <span className="timer-duration">
+                {selectedDuration} minute session
+              </span>
+
+            </div>
+
           </div>
 
           <p className="focus-message">
@@ -557,42 +602,56 @@ function Focus() {
               className="start-mining-button"
               onClick={startMining}
             >
-              ⛏️ Start Mining
+              ⛏️ Start Focus
             </button>
 
           )}
 
-          {/* MINE BLOCK */}
+          {/* PAUSE */}
 
           {isRunning && (
 
-            <button
-              className="mine-button"
-              onClick={mineBlock}
-            >
-              ⛏️ Mine Block
-            </button>
+            <div className="active-controls">
+
+              <button
+                className="pause-button"
+                onClick={pauseMining}
+              >
+                ⏸ Pause
+              </button>
+
+              <button
+                className="end-session-button"
+                onClick={endSession}
+              >
+                End Session
+              </button>
+
+            </div>
 
           )}
 
-          {/* END SESSION */}
+          {/* PAUSED */}
 
-          {isRunning && (
+          {!isRunning &&
+            !completed &&
+            timeLeft <
+              selectedDuration * 60 && (
 
-            <button
-              className="end-session-button"
-              onClick={endSession}
-            >
-              End Session
-            </button>
+              <button
+                className="resume-button"
+                onClick={startMining}
+              >
+                ▶ Resume Focus
+              </button>
 
-          )}
+            )}
 
         </section>
 
-        {/* =================================
-            BLOCKS MINED
-        ================================= */}
+        {/* ===================================
+            PROGRESS
+        =================================== */}
 
         <section className="blocks-card">
 
@@ -601,7 +660,7 @@ function Focus() {
             <div>
 
               <p>
-                🧱 BLOCKS MINED
+                🧱 MINING PROGRESS
               </p>
 
               <h2>
@@ -623,23 +682,26 @@ function Focus() {
               style={{
                 width: `${miningProgress}%`,
               }}
-            ></div>
+            />
 
           </div>
 
+          <p className="blocks-help">
+            Keep your focus active to mine
+            more blocks.
+          </p>
+
         </section>
 
-        {/* =================================
-            REWARD CARDS
-        ================================= */}
+        {/* ===================================
+            REWARD GRID
+        =================================== */}
 
         <section className="reward-grid">
 
           <div className="reward-card">
 
-            <span>
-              ⭐
-            </span>
+            <span>⭐</span>
 
             <strong>
               +{sessionXP} XP
@@ -653,9 +715,7 @@ function Focus() {
 
           <div className="reward-card">
 
-            <span>
-              🧱
-            </span>
+            <span>🧱</span>
 
             <strong>
               {blocks}
@@ -669,9 +729,7 @@ function Focus() {
 
           <div className="reward-card">
 
-            <span>
-              🔥
-            </span>
+            <span>🔥</span>
 
             <strong>
               +1
@@ -685,9 +743,7 @@ function Focus() {
 
           <div className="reward-card">
 
-            <span>
-              💎
-            </span>
+            <span>💎</span>
 
             <strong>
               +10
@@ -704,14 +760,12 @@ function Focus() {
       </main>
 
       {/* =====================================
-          COMPLETION OVERLAY
+          COMPLETION
       ===================================== */}
 
       {completed && (
 
         <div className="completion-overlay">
-
-          {/* CONFETTI */}
 
           <div className="confetti-container">
 
@@ -727,15 +781,11 @@ function Focus() {
                   "--delay": `${Math.random() * 2}s`,
                   "--rotation": `${Math.random() * 360}deg`,
                 }}
-              ></span>
+              />
 
             ))}
 
           </div>
-
-          {/* =================================
-              COMPLETION POPUP
-          ================================= */}
 
           <div className="completion-popup">
 
@@ -757,15 +807,10 @@ function Focus() {
               your mining session.
             </p>
 
-            {/* REWARDS */}
-
             <div className="completion-rewards">
 
               <div>
-
-                <span>
-                  ⏱️
-                </span>
+                <span>⏱️</span>
 
                 <strong>
                   {selectedDuration} min
@@ -774,14 +819,10 @@ function Focus() {
                 <small>
                   Duration
                 </small>
-
               </div>
 
               <div>
-
-                <span>
-                  ⭐
-                </span>
+                <span>⭐</span>
 
                 <strong>
                   +{sessionXP} XP
@@ -790,14 +831,10 @@ function Focus() {
                 <small>
                   XP Earned
                 </small>
-
               </div>
 
               <div>
-
-                <span>
-                  🧱
-                </span>
+                <span>🧱</span>
 
                 <strong>
                   {blocks}
@@ -806,12 +843,9 @@ function Focus() {
                 <small>
                   Blocks Mined
                 </small>
-
               </div>
 
             </div>
-
-            {/* CONTINUE */}
 
             <button
               className="continue-button"
@@ -819,8 +853,6 @@ function Focus() {
             >
               ⚔️ Continue Adventure
             </button>
-
-            {/* MINE AGAIN */}
 
             <button
               className="reset-button"

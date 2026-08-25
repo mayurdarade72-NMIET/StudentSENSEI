@@ -1,588 +1,460 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./World.css";
 
 function World() {
   const navigate = useNavigate();
 
-  // =========================================
-  // XP
-  // =========================================
+  const worlds = [
+    {
+      id: 1,
+      name: "Starting Land",
+      icon: "🌍",
+      description:
+        "Your first home. Begin your study adventure and build your foundation.",
+      requirement: "Available",
+      unlocked: true,
+      theme: "starting",
+    },
+    {
+      id: 2,
+      name: "Forest Plains",
+      icon: "🌲",
+      description:
+        "A peaceful forest waiting for the next stage of your knowledge journey.",
+      requirement: "Reach Level 3",
+      unlocked: false,
+      theme: "forest",
+    },
+    {
+      id: 3,
+      name: "Mines & Caves",
+      icon: "⛏️",
+      description:
+        "Deep underground challenges filled with difficult subjects and discoveries.",
+      requirement: "Reach Level 5",
+      unlocked: false,
+      theme: "mines",
+    },
+    {
+      id: 4,
+      name: "Farming Lands",
+      icon: "🌾",
+      description:
+        "Grow your knowledge, develop your habits, and harvest new rewards.",
+      requirement: "Reach Level 8",
+      unlocked: false,
+      theme: "farming",
+    },
+    {
+      id: 5,
+      name: "Nether Realm",
+      icon: "🔥",
+      description:
+        "A dangerous realm for students ready to face harder challenges.",
+      requirement: "Reach Level 12",
+      unlocked: false,
+      theme: "nether",
+    },
+    {
+      id: 6,
+      name: "Stronghold Keep",
+      icon: "🏰",
+      description:
+        "An ancient stronghold reserved for dedicated adventurers.",
+      requirement: "Reach Level 16",
+      unlocked: false,
+      theme: "stronghold",
+    },
+    {
+      id: 7,
+      name: "The End",
+      icon: "🐉",
+      description:
+        "The final destination of your study adventure. Only the strongest reach it.",
+      requirement: "Reach Level 20",
+      unlocked: false,
+      theme: "end",
+    },
+  ];
 
-  const getXP = () => {
-    const savedXP = localStorage.getItem("studentSenseiXP");
-    return savedXP ? Number(savedXP) : 750;
+  const currentLevel = 1;
+
+  const unlockedWorlds = worlds.filter(
+    (world) => world.unlocked
+  ).length;
+
+  const handleEnterWorld = (world) => {
+    if (!world.unlocked) return;
+
+    if (world.id === 1) {
+      navigate("/dashboard");
+    }
   };
-
-  const [xp, setXp] = useState(getXP);
-
-  // =========================================
-  // SYNC XP
-  // =========================================
-
-  useEffect(() => {
-    const syncXP = () => {
-      setXp(getXP());
-    };
-
-    syncXP();
-
-    window.addEventListener("focus", syncXP);
-    window.addEventListener("storage", syncXP);
-
-    return () => {
-      window.removeEventListener("focus", syncXP);
-      window.removeEventListener("storage", syncXP);
-    };
-  }, []);
-
-  // =========================================
-  // WORLD LEVEL
-  // =========================================
-
-  let worldLevel = 1;
-  let worldName = "Starting Land";
-
-  if (xp >= 900) {
-    worldLevel = 3;
-    worldName = "Village";
-  } else if (xp >= 800) {
-    worldLevel = 2;
-    worldName = "Growing Forest";
-  }
-
-  // =========================================
-  // UNLOCKS
-  // =========================================
-
-  const forestUnlocked = xp >= 800;
-  const villageUnlocked = xp >= 900;
-
-  // =========================================
-  // PROGRESS
-  // =========================================
-
-  const progressPercent = Math.min((xp / 1000) * 100, 100);
-
-  let nextUnlockMessage = "⭐ 50 XP until Growing Forest";
-
-  if (worldLevel === 2) {
-    nextUnlockMessage = "⭐ 100 XP until Village";
-  }
-
-  if (worldLevel === 3) {
-    nextUnlockMessage =
-      "🏆 Village unlocked! Keep growing your world.";
-  }
-
-  // =========================================
-  // FOCUS MINE
-  // =========================================
-
-  const handleFocusMine = () => {
-    navigate("/dashboard");
-  };
-
-  // =========================================
-  // LOCKED AREA
-  // =========================================
-
-  const handleLockedArea = (area) => {
-    alert(
-      `🔒 ${area} is locked!\n\nComplete more quests and earn XP to unlock it.`
-    );
-  };
-
-  // =========================================
-  // RENDER
-  // =========================================
 
   return (
     <div className="world-page">
 
-      {/* =====================================
+      {/* =========================================
+          BACKGROUND DECORATION
+      ========================================= */}
+
+      <div className="world-background-grid" />
+      <div className="world-glow world-glow-one" />
+      <div className="world-glow world-glow-two" />
+
+
+      {/* =========================================
           NAVBAR
-      ===================================== */}
+      ========================================= */}
 
       <nav className="world-navbar">
+
+        <button
+          className="world-back"
+          onClick={() => navigate("/dashboard")}
+        >
+          <span>←</span>
+          Dashboard
+        </button>
 
         <div className="world-logo">
           Student<span>SENSEI</span>
         </div>
 
-        <div className="world-info">
-
-          <span>
-            🌳 OVERWORLD
-          </span>
-
-          <span>
-            ⭐ LEVEL {worldLevel}
-          </span>
-
-          <button
-            className="back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Dashboard
-          </button>
-
+        <div className="world-level">
+          <small>YOUR LEVEL</small>
+          <strong>{currentLevel}</strong>
         </div>
 
       </nav>
 
 
-      {/* =====================================
-          HEADER
-      ===================================== */}
+      {/* =========================================
+          HERO
+      ========================================= */}
 
-      <section className="world-header">
+      <header className="world-hero">
 
-        <p>
-          🌳 THE OVERWORLD
+        <div className="world-hero-badge">
+          🌍 WORLD MAP
+        </div>
+
+        <p className="world-eyebrow">
+          YOUR STUDY ADVENTURE
         </p>
 
         <h1>
-          Your World
+          Explore Your Worlds
         </h1>
 
-        <span>
-          {worldName} • {xp} XP
-        </span>
+        <p className="world-subtitle">
+          Complete quests, earn XP, and unlock new
+          areas of your study adventure.
+        </p>
+
+      </header>
+
+
+      {/* =========================================
+          CURRENT WORLD
+      ========================================= */}
+
+      <section className="current-world-card">
+
+        <div className="current-world-decoration">
+          <span />
+          <span />
+          <span />
+        </div>
+
+        <div className="current-world-icon">
+          🌍
+        </div>
+
+        <div className="current-world-info">
+
+          <span className="current-world-label">
+            CURRENT WORLD
+          </span>
+
+          <h2>
+            Starting Land
+          </h2>
+
+          <p>
+            Your journey begins here. Every quest and
+            focus session helps you grow stronger and
+            unlock the world ahead.
+          </p>
+
+          <div className="current-world-meta">
+
+            <span>
+              🟢 Active
+            </span>
+
+            <span>
+              ⭐ Level {currentLevel}
+            </span>
+
+            <span>
+              🌍 World 01
+            </span>
+
+          </div>
+
+        </div>
+
+        <button
+          className="current-world-button"
+          onClick={() => navigate("/dashboard")}
+        >
+          Enter World
+          <span>→</span>
+        </button>
 
       </section>
 
 
-      {/* =====================================
-          MINECRAFT WORLD
-      ===================================== */}
-
-      <main className="minecraft-world">
-
-        {/* SKY */}
-
-        <div className="minecraft-sky">
-
-          <div className="sun">
-            ☀️
-          </div>
-
-          <div className="cloud cloud-one">
-            ☁️
-          </div>
-
-          <div className="cloud cloud-two">
-            ☁️
-          </div>
-
-        </div>
-
-
-        {/* LAND */}
-
-        <div className="minecraft-land">
-
-          {/* TREE 1 */}
-
-          <div className="world-tree tree-one">
-            🌳
-          </div>
-
-
-          {/* FOREST */}
-
-          {forestUnlocked && (
-            <>
-              <div className="world-tree tree-two">
-                🌲
-              </div>
-
-              <div className="world-tree tree-three">
-                🌳
-              </div>
-            </>
-          )}
-
-
-          {/* LOCKED FOREST */}
-
-          {!forestUnlocked && (
-            <button
-              className="world-locked-object locked-forest"
-              onClick={() => handleLockedArea("Growing Forest")}
-            >
-              🔒
-            </button>
-          )}
-
-
-          {/* VILLAGE */}
-
-          {villageUnlocked ? (
-            <>
-              <div className="world-house">
-                🏠
-              </div>
-
-              <div className="world-house house-two">
-                🏡
-              </div>
-            </>
-          ) : (
-            <button
-              className="world-locked-object locked-house"
-              onClick={() => handleLockedArea("Village")}
-            >
-              🔒
-            </button>
-          )}
-
-
-          {/* PLAYER */}
-
-          <div className="world-player">
-            🧑‍💻
-          </div>
-
-
-          {/* LAPTOP */}
-
-          <div className="world-laptop">
-            💻
-          </div>
-
-
-          {/* =================================
-              FOCUS MINE
-          ================================= */}
-
-          <button
-            className="world-mine"
-            onClick={handleFocusMine}
-            title="Start a Focus Session"
-          >
-
-            <div className="mine-label">
-              ⛏️ FOCUS MINE
-            </div>
-
-            <div className="mine-entrance">
-              🪨 🕳️ 🪨
-            </div>
-
-            <div className="mine-action">
-              ENTER →
-            </div>
-
-          </button>
-
-        </div>
-
-
-        {/* =================================
-            GROUND
-        ================================= */}
-
-        <div className="minecraft-ground">
-
-          <div className="grass-layer"></div>
-
-          <div className="dirt-layer">
-
-            <span>🟫</span>
-            <span>🟫</span>
-            <span>🟫</span>
-            <span>🟫</span>
-            <span>🟫</span>
-            <span>🟫</span>
-            <span>🟫</span>
-            <span>🟫</span>
-
-          </div>
-
-        </div>
-
-      </main>
-
-
-      {/* =====================================
+      {/* =========================================
           WORLD PROGRESSION
-      ===================================== */}
+      ========================================= */}
 
-      <section className="world-progress">
+      <section className="world-path-section">
 
-        <div className="progress-header">
+        <div className="section-heading">
 
           <div>
 
-            <p>
+            <span className="section-kicker">
               WORLD PROGRESSION
-            </p>
+            </span>
 
             <h2>
-              Level {worldLevel} • {worldName}
+              Your Journey
             </h2>
+
+            <p>
+              Every level brings you closer to a new world.
+            </p>
 
           </div>
 
-          <strong>
-            {xp} / 1000 XP
-          </strong>
+          <div className="world-counter">
+
+            <strong>
+              {unlockedWorlds}
+            </strong>
+
+            <span>
+              / {worlds.length} unlocked
+            </span>
+
+          </div>
 
         </div>
 
 
-        <div className="world-progress-bar">
+        {/* =========================================
+            PROGRESS TRACK
+        ========================================= */}
+
+        <div className="world-progress-track">
 
           <div
             className="world-progress-fill"
             style={{
-              width: `${progressPercent}%`,
+              width: `${(unlockedWorlds / worlds.length) * 100}%`,
             }}
-          ></div>
+          />
+
+          {worlds.map((world) => (
+
+            <div
+              key={world.id}
+              className={`progress-dot ${
+                world.unlocked ? "active" : ""
+              } ${
+                world.id === 1 ? "current" : ""
+              }`}
+            />
+
+          ))}
 
         </div>
 
 
-        <p className="next-unlock">
-          {nextUnlockMessage}
-        </p>
+        {/* =========================================
+            WORLD CARDS
+        ========================================= */}
 
-      </section>
+        <div className="world-grid">
 
+          {worlds.map((world) => (
 
-      {/* =====================================
-          WORLD STATS
-      ===================================== */}
+            <article
+              key={world.id}
+              className={`world-card ${
+                world.unlocked
+                  ? "world-unlocked"
+                  : "world-locked"
+              } ${
+                world.id === 1
+                  ? "world-current"
+                  : ""
+              } world-theme-${world.theme}`}
+            >
 
-      <section className="world-stats">
+              {/* CARD IMAGE AREA */}
 
-        {/* VILLAGE */}
+              <div className="world-card-scene">
 
-        <button
-          className={`world-stat ${
-            villageUnlocked ? "unlocked-stat" : "locked-stat"
-          }`}
-          onClick={() =>
-            villageUnlocked
-              ? alert("🏡 Welcome to your Village!")
-              : handleLockedArea("Village")
-          }
-        >
+                <div className="scene-sky" />
 
-          <span>
-            🏡
-          </span>
+                <div className="scene-stars">
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                </div>
 
-          <strong>
-            Village
-          </strong>
+                <div className="scene-mountain" />
 
-          <small>
-            {villageUnlocked
-              ? "UNLOCKED"
-              : "🔒 900 XP required"}
-          </small>
+                <div className="scene-ground" />
 
-        </button>
+                <div className="world-card-icon">
 
+                  {world.unlocked
+                    ? world.icon
+                    : "🔒"}
 
-        {/* FOREST */}
+                </div>
 
-        <button
-          className={`world-stat ${
-            forestUnlocked ? "unlocked-stat" : "locked-stat"
-          }`}
-          onClick={() =>
-            forestUnlocked
-              ? alert("🌲 Welcome to the Growing Forest!")
-              : handleLockedArea("Growing Forest")
-          }
-        >
+                {world.id === 1 && (
+                  <span className="current-badge">
+                    CURRENT
+                  </span>
+                )}
 
-          <span>
-            🌲
-          </span>
-
-          <strong>
-            Forest
-          </strong>
-
-          <small>
-            {forestUnlocked
-              ? "UNLOCKED"
-              : "🔒 800 XP required"}
-          </small>
-
-        </button>
+              </div>
 
 
-        {/* FOCUS MINE */}
+              {/* CARD CONTENT */}
 
-        <button
-          className="world-stat unlocked-stat"
-          onClick={handleFocusMine}
-        >
+              <div className="world-card-body">
 
-          <span>
-            ⛏️
-          </span>
+                <span className="world-number">
+                  WORLD {String(world.id).padStart(2, "0")}
+                </span>
 
-          <strong>
-            Focus Mine
-          </strong>
+                <h3>
+                  {world.name}
+                </h3>
 
-          <small>
-            ENTER MINE →
-          </small>
+                <p>
+                  {world.description}
+                </p>
 
-        </button>
+              </div>
 
 
-        {/* XP */}
+              {/* CARD FOOTER */}
 
-        <div className="world-stat">
+              <div className="world-card-footer">
 
-          <span>
-            ⭐
-          </span>
+                <span
+                  className={
+                    world.unlocked
+                      ? "unlock-status"
+                      : "lock-status"
+                  }
+                >
 
-          <strong>
-            Experience
-          </strong>
+                  {world.unlocked
+                    ? "✓ Unlocked"
+                    : `🔒 ${world.requirement}`}
 
-          <small>
-            {xp} XP
-          </small>
+                </span>
 
-        </div>
+                {world.unlocked && (
 
-      </section>
+                  <button
+                    className="world-enter-button"
+                    onClick={() =>
+                      handleEnterWorld(world)
+                    }
+                  >
+                    Enter
+                    <span>→</span>
+                  </button>
 
+                )}
 
-      {/* =====================================
-          OTHER WORLDS
-      ===================================== */}
+              </div>
 
-      <section className="other-worlds">
+            </article>
 
-        <h2>
-          🌌 Other Worlds
-        </h2>
-
-        <p>
-          Continue your journey to unlock new dimensions.
-        </p>
-
-
-        <div className="dimension-grid">
-
-          {/* OVERWORLD */}
-
-          <button
-            className="dimension-card active"
-            onClick={() => window.scrollTo({
-              top: 0,
-              behavior: "smooth"
-            })}
-          >
-
-            <div className="dimension-icon">
-              🌳
-            </div>
-
-            <h3>
-              Overworld
-            </h3>
-
-            <span>
-              CURRENT WORLD
-            </span>
-
-          </button>
-
-
-          {/* NETHER */}
-
-          <button
-            className="dimension-card locked"
-            onClick={() => handleLockedArea("Nether")}
-          >
-
-            <div className="dimension-icon">
-              🔥
-            </div>
-
-            <h3>
-              Nether
-            </h3>
-
-            <span>
-              🔒 LOCKED
-            </span>
-
-          </button>
-
-
-          {/* THE END */}
-
-          <button
-            className="dimension-card locked"
-            onClick={() => handleLockedArea("The End")}
-          >
-
-            <div className="dimension-icon">
-              🟣
-            </div>
-
-            <h3>
-              The End
-            </h3>
-
-            <span>
-              🔒 LOCKED
-            </span>
-
-          </button>
+          ))}
 
         </div>
 
       </section>
 
 
-      {/* =====================================
-          SENSEI
-      ===================================== */}
+      {/* =========================================
+          SENSEI MESSAGE
+      ========================================= */}
 
-      <section className="world-sensei">
+      <section className="world-message">
 
-        <div className="sensei-icon">
-          🧙
+        <div className="world-message-icon">
+          🧭
         </div>
 
-        <div>
+        <div className="world-message-content">
 
-          <small>
+          <span>
             YOUR SENSEI
-          </small>
+          </span>
 
           <h2>
-            Keep completing quests.
+            Every level unlocks a new part of your adventure.
           </h2>
 
           <p>
-            Every quest gives you XP and helps your world grow.
+            Complete quests and focus sessions to earn XP.
+            The farther you progress, the more of your world
+            you can explore.
           </p>
 
         </div>
 
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/quests")}
         >
-          📜 View Quests
+          Continue Adventure
+          <span>→</span>
         </button>
 
       </section>
+
+
+      {/* =========================================
+          FOOTER
+      ========================================= */}
+
+      <footer className="world-footer">
+
+        <span>
+          STUDENTSENSEI
+        </span>
+
+        <span>
+          Your study adventure. Your success world.
+        </span>
+
+      </footer>
 
     </div>
   );

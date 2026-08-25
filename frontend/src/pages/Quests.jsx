@@ -32,8 +32,7 @@ function Quests() {
   // REWARD POPUP
   // =========================================
 
-  const [reward, setReward] =
-    useState(null);
+  const [reward, setReward] = useState(null);
 
   // =========================================
   // LOAD STUDENT
@@ -60,7 +59,6 @@ function Quests() {
       }
 
       setXp(data.student.xp || 0);
-
       setBackendError(false);
 
     } catch (error) {
@@ -99,11 +97,6 @@ function Quests() {
         );
       }
 
-      // ---------------------------------------
-      // Convert backend tasks into frontend
-      // quest objects.
-      // ---------------------------------------
-
       const formattedTasks =
         data.tasks.map((task) => ({
           id: task.id,
@@ -127,7 +120,6 @@ function Quests() {
         }));
 
       setQuests(formattedTasks);
-
       setBackendError(false);
 
     } catch (error) {
@@ -153,7 +145,7 @@ function Quests() {
   }, []);
 
   // =========================================
-  // REFRESH DATA WHEN RETURNING
+  // REFRESH WHEN RETURNING TO PAGE
   // =========================================
 
   useEffect(() => {
@@ -188,10 +180,6 @@ function Quests() {
       return;
     }
 
-    // =======================================
-    // TEMPORARY FRONTEND COMPLETION
-    // =======================================
-
     const updatedQuests =
       quests.map((item) =>
         item.id === questId
@@ -204,26 +192,14 @@ function Quests() {
 
     setQuests(updatedQuests);
 
-    // =======================================
-    // SHOW REWARD
-    // =======================================
-
     setReward({
       title: quest.title,
       xp: quest.xp,
     });
 
-    // =======================================
-    // REFRESH STUDENT DATA
-    // =======================================
-
     setTimeout(() => {
       loadStudent();
     }, 500);
-
-    // =======================================
-    // CLOSE REWARD
-    // =======================================
 
     setTimeout(() => {
       setReward(null);
@@ -239,12 +215,21 @@ function Quests() {
       (quest) => quest.completed
     ).length;
 
+  const totalQuests =
+    quests.length;
+
   const progressPercent =
-    quests.length === 0
+    totalQuests === 0
       ? 0
       : (completedCount /
-          quests.length) *
+          totalQuests) *
         100;
+
+  const remainingQuests =
+    Math.max(
+      totalQuests - completedCount,
+      0
+    );
 
   // =========================================
   // CONFETTI
@@ -254,7 +239,6 @@ function Quests() {
     return Array.from({
       length: 500,
     }).map((_, index) => {
-
       const fromLeft =
         index % 2 === 0;
 
@@ -334,10 +318,14 @@ function Quests() {
 
         </nav>
 
-        <header className="quests-header">
+        <main className="quests-loading">
+
+          <div className="loading-orb">
+            ⚔️
+          </div>
 
           <p>
-            ⚔️ DAILY ADVENTURES
+            DAILY ADVENTURES
           </p>
 
           <h1>
@@ -345,10 +333,10 @@ function Quests() {
           </h1>
 
           <span>
-            Connecting to StudentSENSEI backend.
+            Connecting to your adventure.
           </span>
 
-        </header>
+        </main>
 
       </div>
     );
@@ -373,7 +361,7 @@ function Quests() {
 
         <div className="quest-player-info">
 
-          <span>
+          <span className="quest-xp-badge">
             ⭐ {xp} XP
           </span>
 
@@ -395,26 +383,16 @@ function Quests() {
       ===================================== */}
 
       <div
-        style={{
-          position: "fixed",
-          top: "10px",
-          right: "10px",
-          zIndex: 9999,
-          padding: "8px 14px",
-          borderRadius: "8px",
-          background:
-            backendError
-              ? "#ef4444"
-              : "#22c55e",
-          color: "white",
-          fontSize: "12px",
-          fontWeight: "700",
-          boxShadow:
-            "0 4px 12px rgba(0,0,0,0.2)",
-        }}
+        className={`quest-backend-status ${
+          backendError
+            ? "backend-error"
+            : "backend-connected"
+        }`}
       >
+        <span className="status-dot"></span>
+
         {backendError
-          ? "Backend error"
+          ? "Backend connection failed"
           : "Backend connected"}
       </div>
 
@@ -441,20 +419,76 @@ function Quests() {
 
 
       {/* =====================================
+          QUEST HUD
+      ===================================== */}
+
+      <section className="quest-hud">
+
+        <div className="quest-hud-item">
+
+          <small>
+            DAILY QUESTS
+          </small>
+
+          <strong>
+            {totalQuests}
+          </strong>
+
+        </div>
+
+        <div className="quest-hud-divider"></div>
+
+        <div className="quest-hud-item">
+
+          <small>
+            COMPLETED
+          </small>
+
+          <strong>
+            {completedCount}
+          </strong>
+
+        </div>
+
+        <div className="quest-hud-divider"></div>
+
+        <div className="quest-hud-item">
+
+          <small>
+            REMAINING
+          </small>
+
+          <strong>
+            {remainingQuests}
+          </strong>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================
           PROGRESS
       ===================================== */}
 
       <section className="quest-progress">
 
-        <div>
+        <div className="quest-progress-header">
 
-          <strong>
-            DAILY PROGRESS
-          </strong>
+          <div>
+
+            <small>
+              DAILY PROGRESS
+            </small>
+
+            <strong>
+              {completedCount} / {totalQuests}
+            </strong>
+
+          </div>
 
           <span>
-            {completedCount} /{" "}
-            {quests.length} Completed
+            {Math.round(progressPercent)}%
           </span>
 
         </div>
@@ -470,6 +504,17 @@ function Quests() {
 
         </div>
 
+        <p>
+          {completedCount === totalQuests &&
+          totalQuests > 0
+            ? "All daily quests completed!"
+            : `${remainingQuests} quest${
+                remainingQuests === 1
+                  ? ""
+                  : "s"
+              } remaining today.`}
+        </p>
+
       </section>
 
 
@@ -483,24 +528,36 @@ function Quests() {
 
           <div className="all-quests-complete">
 
-            <div>
+            <div className="empty-quest-icon">
               📭
             </div>
+
+            <p>
+              DAILY ADVENTURES
+            </p>
 
             <h2>
               No Quests Available
             </h2>
 
-            <p>
+            <span>
               Your Sensei hasn't assigned any
               quests yet.
-            </p>
+            </span>
+
+            <button
+              onClick={() =>
+                navigate("/dashboard")
+              }
+            >
+              ← Return to Dashboard
+            </button>
 
           </div>
 
         ) : (
 
-          quests.map((quest) => (
+          quests.map((quest, index) => (
 
             <article
               key={quest.id}
@@ -511,6 +568,13 @@ function Quests() {
               }`}
             >
 
+              <div className="quest-number">
+                {String(index + 1).padStart(
+                  2,
+                  "0"
+                )}
+              </div>
+
               <div className="quest-icon">
                 {quest.icon}
               </div>
@@ -519,11 +583,19 @@ function Quests() {
 
                 <div className="quest-title-row">
 
-                  <h2>
-                    {quest.title}
-                  </h2>
+                  <div>
 
-                  <span>
+                    <small>
+                      DAILY QUEST
+                    </small>
+
+                    <h2>
+                      {quest.title}
+                    </h2>
+
+                  </div>
+
+                  <span className="quest-xp-reward">
                     +{quest.xp} XP
                   </span>
 
@@ -570,18 +642,22 @@ function Quests() {
 
         <section className="all-quests-complete">
 
-          <div>
+          <div className="completion-trophy">
             🏆
           </div>
+
+          <p>
+            QUEST BOARD CLEARED
+          </p>
 
           <h2>
             All Quests Complete!
           </h2>
 
-          <p>
+          <span>
             Amazing work, Adventurer.
             Come back tomorrow for new quests.
-          </p>
+          </span>
 
           <button
             onClick={() =>
@@ -604,8 +680,6 @@ function Quests() {
 
         <div className="quest-reward-overlay">
 
-          {/* CONFETTI */}
-
           <div className="quest-confetti-container">
 
             <div className="confetti-cannon cannon-left">
@@ -621,9 +695,9 @@ function Quests() {
           </div>
 
 
-          {/* POPUP */}
-
           <div className="quest-reward">
+
+            <div className="reward-glow"></div>
 
             <div className="reward-icon">
               🏆
@@ -641,16 +715,22 @@ function Quests() {
               {reward.title}
             </span>
 
-            <strong>
-              +{reward.xp} XP
-            </strong>
+            <div className="reward-xp">
+              <small>
+                REWARD
+              </small>
+
+              <strong>
+                +{reward.xp} XP
+              </strong>
+            </div>
 
             <button
               onClick={() =>
                 setReward(null)
               }
             >
-              ⚔️ Continue
+              ⚔️ Continue Adventure
             </button>
 
           </div>

@@ -15,19 +15,17 @@ function Achievements() {
   };
 
   const getCompletedQuests = () => {
-    const saved =
-      localStorage.getItem(
-        "studentSenseiCompletedQuests"
-      );
+    const saved = localStorage.getItem(
+      "studentSenseiCompletedQuests"
+    );
 
     return saved ? Number(saved) : 0;
   };
 
   const getFocusSessions = () => {
-    const saved =
-      localStorage.getItem(
-        "studentSenseiSessions"
-      );
+    const saved = localStorage.getItem(
+      "studentSenseiSessions"
+    );
 
     return saved ? Number(saved) : 0;
   };
@@ -50,11 +48,10 @@ function Achievements() {
       icon: "⚔️",
       title: "First Quest",
       description:
-        "Complete your first quest.",
-      requirement:
-        "Complete 1 quest",
-      unlocked:
-        completedQuests >= 1,
+        "Complete your first quest and begin your adventure.",
+      requirement: "Complete 1 quest",
+      unlocked: completedQuests >= 1,
+      reward: "+25 XP",
     },
 
     {
@@ -63,10 +60,9 @@ function Achievements() {
       title: "First Focus",
       description:
         "Complete your first Focus Mine session.",
-      requirement:
-        "Complete 1 focus session",
-      unlocked:
-        focusSessions >= 1,
+      requirement: "Complete 1 focus session",
+      unlocked: focusSessions >= 1,
+      reward: "+25 XP",
     },
 
     {
@@ -74,11 +70,10 @@ function Achievements() {
       icon: "⭐",
       title: "Rising Adventurer",
       description:
-        "Reach 1000 XP.",
-      requirement:
-        "Reach 1000 XP",
-      unlocked:
-        xp >= 1000,
+        "Reach 1000 XP through quests and focus sessions.",
+      requirement: "Reach 1000 XP",
+      unlocked: xp >= 1000,
+      reward: "+100 XP",
     },
 
     {
@@ -86,11 +81,10 @@ function Achievements() {
       icon: "🌲",
       title: "Forest Explorer",
       description:
-        "Unlock the Growing Forest.",
-      requirement:
-        "Reach 800 XP",
-      unlocked:
-        xp >= 800,
+        "Unlock the next region of your study world.",
+      requirement: "Reach Level 3",
+      unlocked: xp >= 500,
+      reward: "Forest Plains",
     },
 
     {
@@ -98,11 +92,43 @@ function Achievements() {
       icon: "🏡",
       title: "Village Builder",
       description:
-        "Unlock your first village.",
-      requirement:
-        "Reach 900 XP",
-      unlocked:
-        xp >= 900,
+        "Grow your study world by reaching a major milestone.",
+      requirement: "Reach 900 XP",
+      unlocked: xp >= 900,
+      reward: "+150 XP",
+    },
+
+    {
+      id: "quest-warrior",
+      icon: "🗡️",
+      title: "Quest Warrior",
+      description:
+        "Complete multiple quests and prove your consistency.",
+      requirement: "Complete 5 quests",
+      unlocked: completedQuests >= 5,
+      reward: "+100 XP",
+    },
+
+    {
+      id: "focus-master",
+      icon: "⛏️",
+      title: "Focus Master",
+      description:
+        "Build a strong focus habit through repeated sessions.",
+      requirement: "Complete 10 focus sessions",
+      unlocked: focusSessions >= 10,
+      reward: "+200 XP",
+    },
+
+    {
+      id: "study-legend",
+      icon: "💎",
+      title: "Study Legend",
+      description:
+        "Reach the next major stage of your StudentSENSEI journey.",
+      requirement: "Reach 2000 XP",
+      unlocked: xp >= 2000,
+      reward: "Legendary Status",
     },
   ];
 
@@ -113,26 +139,18 @@ function Achievements() {
   useEffect(() => {
     const syncData = () => {
       setXp(getXP());
-      setCompletedQuests(
-        getCompletedQuests()
-      );
-      setFocusSessions(
-        getFocusSessions()
-      );
+      setCompletedQuests(getCompletedQuests());
+      setFocusSessions(getFocusSessions());
     };
 
     syncData();
 
-    window.addEventListener(
-      "focus",
-      syncData
-    );
+    window.addEventListener("focus", syncData);
+    window.addEventListener("storage", syncData);
 
     return () => {
-      window.removeEventListener(
-        "focus",
-        syncData
-      );
+      window.removeEventListener("focus", syncData);
+      window.removeEventListener("storage", syncData);
     };
   }, []);
 
@@ -140,19 +158,22 @@ function Achievements() {
   // COUNTS
   // =========================================
 
-  const unlockedCount =
-    achievementList.filter(
-      (achievement) =>
-        achievement.unlocked
-    ).length;
+  const unlockedCount = achievementList.filter(
+    (achievement) => achievement.unlocked
+  ).length;
 
-  const totalAchievements =
-    achievementList.length;
+  const totalAchievements = achievementList.length;
 
   const progressPercent =
-    (unlockedCount /
-      totalAchievements) *
-    100;
+    totalAchievements > 0
+      ? (unlockedCount / totalAchievements) * 100
+      : 0;
+
+  // =========================================
+  // PLAYER LEVEL
+  // =========================================
+
+  const playerLevel = Math.floor(xp / 250) + 1;
 
   // =========================================
   // RENDER
@@ -161,43 +182,43 @@ function Achievements() {
   return (
     <div className="achievements-page">
 
-      {/* =====================================
+      {/* =========================================
           NAVBAR
-      ===================================== */}
+      ========================================= */}
 
       <nav className="achievements-navbar">
+
+        <button
+          className="achievements-back"
+          onClick={() => navigate("/dashboard")}
+        >
+          ← Dashboard
+        </button>
 
         <div className="achievements-logo">
           Student<span>SENSEI</span>
         </div>
 
-        <div className="achievements-nav">
+        <div className="achievements-level">
 
-          <span>
-            🏆 {unlockedCount} /{" "}
-            {totalAchievements}
-          </span>
+          <small>YOUR LEVEL</small>
 
-          <button
-            onClick={() =>
-              navigate("/dashboard")
-            }
-          >
-            ← Dashboard
-          </button>
+          <strong>
+            {playerLevel}
+          </strong>
 
         </div>
 
       </nav>
 
 
-      {/* =====================================
-          HEADER
-      ===================================== */}
+      {/* =========================================
+          HERO
+      ========================================= */}
 
       <header className="achievements-header">
 
-        <p>
+        <p className="achievements-eyebrow">
           🏆 YOUR TROPHIES
         </p>
 
@@ -205,28 +226,27 @@ function Achievements() {
           Achievements
         </h1>
 
-        <span>
+        <p>
           Complete quests, master your focus,
-          and grow your world.
-        </span>
+          and unlock your study milestones.
+        </p>
 
       </header>
 
 
-      {/* =====================================
-          PLAYER SUMMARY
-      ===================================== */}
+      {/* =========================================
+          SUMMARY
+      ========================================= */}
 
       <section className="achievement-summary">
 
         <div className="summary-item">
 
-          <span>
+          <div className="summary-icon">
             ⭐
-          </span>
+          </div>
 
           <div>
-
             <small>
               EXPERIENCE
             </small>
@@ -234,7 +254,6 @@ function Achievements() {
             <strong>
               {xp} XP
             </strong>
-
           </div>
 
         </div>
@@ -242,20 +261,18 @@ function Achievements() {
 
         <div className="summary-item">
 
-          <span>
+          <div className="summary-icon">
             ⚔️
-          </span>
+          </div>
 
           <div>
-
             <small>
-              QUESTS
+              QUESTS COMPLETED
             </small>
 
             <strong>
               {completedQuests}
             </strong>
-
           </div>
 
         </div>
@@ -263,12 +280,11 @@ function Achievements() {
 
         <div className="summary-item">
 
-          <span>
+          <div className="summary-icon">
             ⛏️
-          </span>
+          </div>
 
           <div>
-
             <small>
               FOCUS SESSIONS
             </small>
@@ -276,7 +292,6 @@ function Achievements() {
             <strong>
               {focusSessions}
             </strong>
-
           </div>
 
         </div>
@@ -284,115 +299,134 @@ function Achievements() {
       </section>
 
 
-      {/* =====================================
+      {/* =========================================
           ACHIEVEMENT PROGRESS
-      ===================================== */}
+      ========================================= */}
 
       <section className="achievement-progress">
 
         <div className="achievement-progress-header">
 
+          <div>
+            <small>
+              ACHIEVEMENT PROGRESS
+            </small>
+
+            <h2>
+              {unlockedCount} / {totalAchievements}
+            </h2>
+          </div>
+
           <strong>
-            ACHIEVEMENT PROGRESS
+            {Math.round(progressPercent)}%
           </strong>
 
-          <span>
-            {unlockedCount} /{" "}
-            {totalAchievements}
-          </span>
-
         </div>
+
 
         <div className="achievement-progress-bar">
 
           <div
             style={{
-              width:
-                `${progressPercent}%`,
+              width: `${progressPercent}%`,
             }}
-          ></div>
+          />
 
         </div>
 
+
         <p>
-          {unlockedCount ===
-          totalAchievements
+          {unlockedCount === totalAchievements
             ? "🏆 All achievements unlocked!"
-            : `${totalAchievements -
-                unlockedCount} achievements remaining`}
+            : `${totalAchievements - unlockedCount} achievements remaining`}
         </p>
 
       </section>
 
 
-      {/* =====================================
+      {/* =========================================
           ACHIEVEMENT GRID
-      ===================================== */}
+      ========================================= */}
 
       <main className="achievement-grid">
 
-        {achievementList.map(
-          (achievement) => (
+        {achievementList.map((achievement) => (
 
-            <article
-              key={achievement.id}
-              className={`achievement-card ${
-                achievement.unlocked
-                  ? "unlocked"
-                  : "locked"
-              }`}
-            >
+          <article
+            key={achievement.id}
+            className={`achievement-card ${
+              achievement.unlocked
+                ? "unlocked"
+                : "locked"
+            }`}
+          >
 
-              {/* ICON */}
+            {/* CARD ICON */}
 
-              <div className="achievement-icon">
+            <div className="achievement-icon">
 
-                {achievement.unlocked
-                  ? achievement.icon
-                  : "🔒"}
+              {achievement.unlocked
+                ? achievement.icon
+                : "🔒"}
+
+            </div>
+
+
+            {/* CARD CONTENT */}
+
+            <div className="achievement-content">
+
+              <div className="achievement-title-row">
+
+                <span className="achievement-number">
+                  ACHIEVEMENT
+                </span>
+
+                {achievement.unlocked && (
+                  <span className="unlocked-badge">
+                    UNLOCKED
+                  </span>
+                )}
 
               </div>
 
 
-              {/* CONTENT */}
+              <h2>
+                {achievement.title}
+              </h2>
 
-              <div className="achievement-content">
 
-                <div className="achievement-title">
+              <p>
+                {achievement.description}
+              </p>
 
-                  <h2>
-                    {achievement.title}
-                  </h2>
 
-                  {achievement.unlocked && (
-                    <span>
-                      UNLOCKED
-                    </span>
-                  )}
-
-                </div>
-
-                <p>
-                  {achievement.description}
-                </p>
+              <div className="achievement-footer">
 
                 <small>
-                  {achievement.requirement}
+                  {achievement.unlocked
+                    ? `✓ ${achievement.requirement}`
+                    : `🔒 ${achievement.requirement}`}
                 </small>
+
+                <span className="achievement-reward">
+                  {achievement.reward}
+                </span>
 
               </div>
 
-            </article>
+            </div>
 
-          )
-        )}
+          </article>
+
+        ))}
 
       </main>
 
 
-      {/* =====================================
-          SENSEI
-      ===================================== */}
+      {/* =========================================
+          SENSEI MESSAGE
+      ========================================= */}
 
       <section className="achievement-sensei">
 
@@ -400,7 +434,8 @@ function Achievements() {
           🧙
         </div>
 
-        <div>
+
+        <div className="achievement-sensei-message">
 
           <small>
             YOUR SENSEI
@@ -411,18 +446,17 @@ function Achievements() {
           </h2>
 
           <p>
-            Keep completing quests and
-            mastering your focus.
+            Keep completing quests and mastering
+            your focus. Your world grows with you.
           </p>
 
         </div>
 
+
         <button
-          onClick={() =>
-            navigate("/quests")
-          }
+          onClick={() => navigate("/quests")}
         >
-          ⚔️ Continue Questing
+          ⚔️ Continue Questing →
         </button>
 
       </section>

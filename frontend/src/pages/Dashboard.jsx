@@ -62,7 +62,6 @@ function Dashboard() {
       }
 
       setStudent(data.student);
-
     } catch (error) {
       console.error(
         "Student API error:",
@@ -341,24 +340,23 @@ function Dashboard() {
             style={{
               width: `${levelProgress}%`,
             }}
-          ></div>
+          />
 
         </div>
 
         <p>
-          {Math.max(
-            levelEndXP - xp,
-            0
-          )}{" "}
-          XP until Level{" "}
-          {level + 1}
+          {levelEndXP - xp > 0
+            ? `${levelEndXP - xp} XP until Level ${
+                level + 1
+              }`
+            : "Level complete!"}
         </p>
 
       </section>
 
 
       {/* =====================================
-          MAIN ACTIONS
+          MAIN GRID
       ===================================== */}
 
       <main className="dashboard-grid">
@@ -367,7 +365,7 @@ function Dashboard() {
             QUESTS
         ================================= */}
 
-        <article className="dashboard-card quests-card">
+        <article className="dashboard-card">
 
           <div className="dashboard-card-icon">
             ⚔️
@@ -394,7 +392,7 @@ function Dashboard() {
                 style={{
                   width: `${questProgress}%`,
                 }}
-              ></div>
+              />
 
             </div>
 
@@ -531,6 +529,8 @@ function Dashboard() {
 
       <section className="dashboard-stats">
 
+        {/* TOTAL XP */}
+
         <div className="dashboard-stat">
 
           <span>
@@ -551,6 +551,31 @@ function Dashboard() {
 
         </div>
 
+
+        {/* COINS */}
+
+        <div className="dashboard-stat">
+
+          <span>
+            🪙
+          </span>
+
+          <div>
+
+            <small>
+              COINS
+            </small>
+
+            <strong>
+              {coins}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        {/* QUESTS */}
 
         <div className="dashboard-stat">
 
@@ -573,6 +598,8 @@ function Dashboard() {
         </div>
 
 
+        {/* FOCUS */}
+
         <div className="dashboard-stat">
 
           <span>
@@ -593,6 +620,8 @@ function Dashboard() {
 
         </div>
 
+
+        {/* WORLD */}
 
         <div className="dashboard-stat">
 
