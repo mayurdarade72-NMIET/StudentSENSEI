@@ -272,7 +272,7 @@ body {
     relative;
 
   height:
-    400px;
+    360px;
 
   overflow:
     hidden;
@@ -794,10 +794,10 @@ body {
     min(650px, 90%);
 
   margin:
-    -38px auto 0;
+    -30px auto 0;
 
   padding:
-    30px;
+    25px;
 
   text-align:
     center;
@@ -847,10 +847,10 @@ body {
 
 .duration-selector {
   margin:
-    19px auto 24px;
+    16px auto 20px;
 
   padding:
-    16px;
+    14px;
 
   background:
     rgba(3, 17, 9, 0.65);
@@ -1072,13 +1072,13 @@ body {
     relative;
 
   width:
-    245px;
+    220px;
 
   height:
-    245px;
+    220px;
 
   margin:
-    25px auto 18px;
+    20px auto 14px;
 
   display:
     flex;
@@ -1111,7 +1111,7 @@ body {
     absolute;
 
   inset:
-    9px;
+    8px;
 
   border-radius:
     50%;
@@ -1132,10 +1132,10 @@ body {
     2;
 
   width:
-    205px;
+    184px;
 
   height:
-    205px;
+    184px;
 
   display:
     flex;
@@ -1216,7 +1216,7 @@ body {
 
 .focus-message {
   margin:
-    8px 0 18px;
+    6px 0 15px;
 
   color:
     #aabbb0;
@@ -1395,15 +1395,47 @@ body {
 }
 
 /* =========================================================
+   POLISH: TIGHTER DESKTOP FLOW
+========================================================= */
+
+@media (min-width: 801px) {
+  .mine-background {
+    height: 360px;
+  }
+
+  .timer-panel {
+    width: min(620px, 90%);
+  }
+
+  .timer-ring {
+    width: 220px;
+    height: 220px;
+  }
+
+  .timer-ring-inner {
+    width: 184px;
+    height: 184px;
+  }
+
+  .blocks-card {
+    margin-top: 20px;
+  }
+
+  .reward-grid {
+    margin-top: 12px;
+  }
+}
+
+/* =========================================================
    BLOCKS CARD
 ========================================================= */
 
 .blocks-card {
   margin-top:
-    25px;
+    20px;
 
   padding:
-    23px;
+    20px;
 
   background:
     linear-gradient(
@@ -1479,7 +1511,7 @@ body {
     hidden;
 
   margin-top:
-    15px;
+    12px;
 
   border-radius:
     99px;
@@ -1542,7 +1574,7 @@ body {
     12px;
 
   margin-top:
-    15px;
+    12px;
 }
 
 .reward-card {
