@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Quests.css";
 
@@ -12,10 +12,30 @@ function Quests() {
   const API_URL = "http://127.0.0.1:8000";
 
   // =========================================
+  // CONSTANTS
+  // =========================================
+
+  const MAX_QUESTS = 10;
+
+  const CUSTOM_QUESTS_KEY =
+    "studentSenseiCustomQuests";
+
+  const CUSTOM_XP_KEY =
+    "studentSenseiCustomXP";
+
+  // =========================================
   // XP
   // =========================================
 
   const [xp, setXp] = useState(0);
+
+  const [customXp, setCustomXp] = useState(() => {
+    return (
+      Number(
+        localStorage.getItem(CUSTOM_XP_KEY)
+      ) || 0
+    );
+  });
 
   // =========================================
   // QUESTS
@@ -29,10 +49,36 @@ function Quests() {
     useState(false);
 
   // =========================================
+  // ADD QUEST MODAL
+  // =========================================
+
+  const [showAddQuest, setShowAddQuest] =
+    useState(false);
+
+  const [questTitle, setQuestTitle] =
+    useState("");
+
+  const [questDescription, setQuestDescription] =
+    useState("");
+
+  const [questDate, setQuestDate] =
+    useState("");
+
+  const [questTime, setQuestTime] =
+    useState("");
+
+  const [questDifficulty, setQuestDifficulty] =
+    useState("easy");
+
+  const [formError, setFormError] =
+    useState("");
+
+  // =========================================
   // REWARD POPUP
   // =========================================
 
-  const [reward, setReward] = useState(null);
+  const [reward, setReward] =
+    useState(null);
 
   // =========================================
   // LOAD STUDENT
@@ -59,8 +105,8 @@ function Quests() {
       }
 
       setXp(data.student.xp || 0);
-      setBackendError(false);
 
+      setBackendError(false);
     } catch (error) {
       console.error(
         "Student API error:",
@@ -97,9 +143,17 @@ function Quests() {
         );
       }
 
+      // ---------------------------------------
+      // BACKEND TASKS
+      // ---------------------------------------
+
       const formattedTasks =
         data.tasks.map((task) => ({
-          id: task.id,
+          id: `backend-${task.id}`,
+
+          backendId: task.id,
+
+          source: "backend",
 
           title:
             task.task_text,
@@ -117,11 +171,57 @@ function Quests() {
 
           taskDate:
             task.task_date,
+
+          dueDate:
+            task.task_date || "",
+
+          dueTime:
+            "",
         }));
 
-      setQuests(formattedTasks);
-      setBackendError(false);
+      // ---------------------------------------
+      // LOAD CUSTOM QUESTS
+      // ---------------------------------------
 
+      const savedCustomQuests =
+        localStorage.getItem(
+          CUSTOM_QUESTS_KEY
+        );
+
+      let customQuests = [];
+
+      if (savedCustomQuests) {
+        try {
+          const parsed =
+            JSON.parse(
+              savedCustomQuests
+            );
+
+          if (Array.isArray(parsed)) {
+            customQuests = parsed;
+          }
+        } catch (error) {
+          console.error(
+            "Custom quest data error:",
+            error
+          );
+
+          localStorage.removeItem(
+            CUSTOM_QUESTS_KEY
+          );
+        }
+      }
+
+      // ---------------------------------------
+      // COMBINE BACKEND + CUSTOM
+      // ---------------------------------------
+
+      setQuests([
+        ...formattedTasks,
+        ...customQuests,
+      ]);
+
+      setBackendError(false);
     } catch (error) {
       console.error(
         "Daily tasks API error:",
@@ -130,6 +230,38 @@ function Quests() {
 
       setBackendError(true);
 
+      // ---------------------------------------
+      // BACKEND OFFLINE
+      // ---------------------------------------
+      // Still show custom quests.
+      // ---------------------------------------
+
+      const savedCustomQuests =
+        localStorage.getItem(
+          CUSTOM_QUESTS_KEY
+        );
+
+      let customQuests = [];
+
+      if (savedCustomQuests) {
+        try {
+          const parsed =
+            JSON.parse(
+              savedCustomQuests
+            );
+
+          if (Array.isArray(parsed)) {
+            customQuests = parsed;
+          }
+        } catch (error) {
+          console.error(
+            "Custom quest data error:",
+            error
+          );
+        }
+      }
+
+      setQuests(customQuests);
     } finally {
       setLoading(false);
     }
@@ -152,6 +284,14 @@ function Quests() {
     const handleFocus = () => {
       loadStudent();
       loadDailyTasks();
+
+      setCustomXp(
+        Number(
+          localStorage.getItem(
+            CUSTOM_XP_KEY
+          )
+        ) || 0
+      );
     };
 
     window.addEventListener(
@@ -168,38 +308,265 @@ function Quests() {
   }, []);
 
   // =========================================
-  // COMPLETE QUEST
+  // SAVE CUSTOM QUESTS
   // =========================================
 
-  const completeQuest = async (questId) => {
-    const quest = quests.find(
-      (item) => item.id === questId
-    );
+  useEffect(() => {
+    const customQuests =
+      quests.filter(
+        (quest) =>
+          quest.source === "custom"
+      );
 
-    if (!quest || quest.completed) {
+    localStorage.setItem(
+      CUSTOM_QUESTS_KEY,
+      JSON.stringify(customQuests)
+    );
+  }, [quests]);
+
+  // =========================================
+  // ADD QUEST
+  // =========================================
+
+  const addQuest = () => {
+    setFormError("");
+
+    // ---------------------------------------
+    // LIMIT
+    // ---------------------------------------
+
+    if (quests.length >= MAX_QUESTS) {
+      setFormError(
+        `You can have a maximum of ${MAX_QUESTS} quests.`
+      );
+
       return;
     }
 
-    const updatedQuests =
-      quests.map((item) =>
-        item.id === questId
-          ? {
-              ...item,
-              completed: true,
-            }
-          : item
+    // ---------------------------------------
+    // TITLE
+    // ---------------------------------------
+
+    const cleanTitle =
+      questTitle.trim();
+
+    if (!cleanTitle) {
+      setFormError(
+        "Please enter a quest title."
       );
 
-    setQuests(updatedQuests);
+      return;
+    }
+
+    // ---------------------------------------
+    // XP
+    // ---------------------------------------
+
+    const difficultyXP = {
+      easy: 5,
+      medium: 10,
+      hard: 15,
+    };
+
+    // ---------------------------------------
+    // NEW QUEST
+    // ---------------------------------------
+
+    const newQuest = {
+      id:
+        `custom-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}`,
+
+      source: "custom",
+
+      title:
+        cleanTitle,
+
+      description:
+        questDescription.trim() ||
+        "Complete this learning task.",
+
+      icon:
+        "📜",
+
+      xp:
+        difficultyXP[
+          questDifficulty
+        ],
+
+      completed:
+        false,
+
+      dueDate:
+        questDate || "",
+
+      dueTime:
+        questTime || "",
+
+      difficulty:
+        questDifficulty,
+
+      createdAt:
+        new Date().toISOString(),
+    };
+
+    setQuests((previous) => [
+      ...previous,
+      newQuest,
+    ]);
+
+    // ---------------------------------------
+    // RESET FORM
+    // ---------------------------------------
+
+    setQuestTitle("");
+    setQuestDescription("");
+    setQuestDate("");
+    setQuestTime("");
+    setQuestDifficulty("easy");
+    setFormError("");
+    setShowAddQuest(false);
+  };
+
+  // =========================================
+  // CLOSE ADD QUEST MODAL
+  // =========================================
+
+  const closeAddQuest = () => {
+    setShowAddQuest(false);
+
+    setQuestTitle("");
+    setQuestDescription("");
+    setQuestDate("");
+    setQuestTime("");
+    setQuestDifficulty("easy");
+    setFormError("");
+  };
+
+  // =========================================
+  // DELETE CUSTOM QUEST
+  // =========================================
+
+  const deleteQuest = (questId) => {
+    const quest =
+      quests.find(
+        (item) =>
+          item.id === questId
+      );
+
+    if (
+      !quest ||
+      quest.source !== "custom"
+    ) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        "Delete this quest?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setQuests((previous) =>
+      previous.filter(
+        (item) =>
+          item.id !== questId
+      )
+    );
+  };
+
+  // =========================================
+  // COMPLETE QUEST
+  // =========================================
+
+  const completeQuest = (questId) => {
+    const quest =
+      quests.find(
+        (item) =>
+          item.id === questId
+      );
+
+    if (
+      !quest ||
+      quest.completed
+    ) {
+      return;
+    }
+
+    // ---------------------------------------
+    // CUSTOM QUEST XP
+    // ---------------------------------------
+
+    if (
+      quest.source === "custom"
+    ) {
+      const currentCustomXP =
+        Number(
+          localStorage.getItem(
+            CUSTOM_XP_KEY
+          )
+        ) || 0;
+
+      const newCustomXP =
+        currentCustomXP +
+        quest.xp;
+
+      localStorage.setItem(
+        CUSTOM_XP_KEY,
+        String(newCustomXP)
+      );
+
+      setCustomXp(
+        newCustomXP
+      );
+    }
+
+    // ---------------------------------------
+    // MARK COMPLETE
+    // ---------------------------------------
+
+    const updatedQuests =
+      quests.map(
+        (item) =>
+          item.id === questId
+            ? {
+                ...item,
+                completed: true,
+              }
+            : item
+      );
+
+    setQuests(
+      updatedQuests
+    );
+
+    // ---------------------------------------
+    // REWARD
+    // ---------------------------------------
 
     setReward({
-      title: quest.title,
-      xp: quest.xp,
+      title:
+        quest.title,
+
+      xp:
+        quest.xp,
     });
+
+    // ---------------------------------------
+    // REFRESH BACKEND XP
+    // ---------------------------------------
 
     setTimeout(() => {
       loadStudent();
     }, 500);
+
+    // ---------------------------------------
+    // AUTO CLOSE
+    // ---------------------------------------
 
     setTimeout(() => {
       setReward(null);
@@ -212,7 +579,8 @@ function Quests() {
 
   const completedCount =
     quests.filter(
-      (quest) => quest.completed
+      (quest) =>
+        quest.completed
     ).length;
 
   const totalQuests =
@@ -227,9 +595,62 @@ function Quests() {
 
   const remainingQuests =
     Math.max(
-      totalQuests - completedCount,
+      totalQuests -
+        completedCount,
       0
     );
+
+  // =========================================
+  // QUEST SLOT COUNT
+  // =========================================
+
+  const remainingSlots =
+    Math.max(
+      MAX_QUESTS -
+        totalQuests,
+      0
+    );
+
+  // =========================================
+  // DISPLAY XP
+  // =========================================
+
+  const displayedXP =
+    xp + customXp;
+
+  // =========================================
+  // DATE FORMATTER
+  // =========================================
+
+  const formatDate = (
+    date
+  ) => {
+    if (!date) {
+      return null;
+    }
+
+    const parsedDate =
+      new Date(
+        `${date}T00:00:00`
+      );
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+      return date;
+    }
+
+    return parsedDate.toLocaleDateString(
+      undefined,
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
 
   // =========================================
   // CONFETTI
@@ -237,7 +658,7 @@ function Quests() {
 
   const createConfetti = () => {
     return Array.from({
-      length: 500,
+      length: 120,
     }).map((_, index) => {
       const fromLeft =
         index % 2 === 0;
@@ -281,7 +702,7 @@ function Quests() {
               0.6
             }`,
           }}
-        />
+        ></span>
       );
     });
   };
@@ -318,14 +739,10 @@ function Quests() {
 
         </nav>
 
-        <main className="quests-loading">
-
-          <div className="loading-orb">
-            ⚔️
-          </div>
+        <header className="quests-header">
 
           <p>
-            DAILY ADVENTURES
+            ⚔️ DAILY ADVENTURES
           </p>
 
           <h1>
@@ -333,10 +750,10 @@ function Quests() {
           </h1>
 
           <span>
-            Connecting to your adventure.
+            Connecting to StudentSENSEI backend.
           </span>
 
-        </main>
+        </header>
 
       </div>
     );
@@ -361,8 +778,8 @@ function Quests() {
 
         <div className="quest-player-info">
 
-          <span className="quest-xp-badge">
-            ⭐ {xp} XP
+          <span>
+            ⭐ {displayedXP} XP
           </span>
 
           <button
@@ -416,6 +833,44 @@ function Quests() {
         </span>
 
       </header>
+
+
+      {/* =====================================
+          ACTION BAR
+      ===================================== */}
+
+      <section className="quest-action-bar">
+
+        <div>
+
+          <small>
+            QUEST BOARD
+          </small>
+
+          <strong>
+            {totalQuests} / {MAX_QUESTS}
+          </strong>
+
+          <span>
+            {remainingSlots} slots remaining
+          </span>
+
+        </div>
+
+        <button
+          className="add-quest-button"
+          disabled={
+            totalQuests >= MAX_QUESTS
+          }
+          onClick={() => {
+            setFormError("");
+            setShowAddQuest(true);
+          }}
+        >
+          ➕ Add Quest
+        </button>
+
+      </section>
 
 
       {/* =====================================
@@ -488,7 +943,10 @@ function Quests() {
           </div>
 
           <span>
-            {Math.round(progressPercent)}%
+            {Math.round(
+              progressPercent
+            )}
+            %
           </span>
 
         </div>
@@ -505,11 +963,13 @@ function Quests() {
         </div>
 
         <p>
-          {completedCount === totalQuests &&
+          {completedCount ===
+            totalQuests &&
           totalQuests > 0
             ? "All daily quests completed!"
             : `${remainingQuests} quest${
-                remainingQuests === 1
+                remainingQuests ===
+                1
                   ? ""
                   : "s"
               } remaining today.`}
@@ -541,91 +1001,173 @@ function Quests() {
             </h2>
 
             <span>
-              Your Sensei hasn't assigned any
-              quests yet.
+              Add your first quest and start your adventure.
             </span>
 
             <button
               onClick={() =>
-                navigate("/dashboard")
+                setShowAddQuest(true)
               }
             >
-              ← Return to Dashboard
+              ➕ Add Your First Quest
             </button>
 
           </div>
 
         ) : (
 
-          quests.map((quest, index) => (
+          quests.map(
+            (
+              quest,
+              index
+            ) => (
 
-            <article
-              key={quest.id}
-              className={`quest-card ${
-                quest.completed
-                  ? "completed"
-                  : ""
-              }`}
-            >
+              <article
+                key={quest.id}
+                className={`quest-card ${
+                  quest.completed
+                    ? "completed"
+                    : ""
+                }`}
+              >
 
-              <div className="quest-number">
-                {String(index + 1).padStart(
-                  2,
-                  "0"
-                )}
-              </div>
+                <div className="quest-number">
+                  {String(
+                    index + 1
+                  ).padStart(
+                    2,
+                    "0"
+                  )}
+                </div>
 
-              <div className="quest-icon">
-                {quest.icon}
-              </div>
 
-              <div className="quest-details">
+                <div className="quest-icon">
+                  {quest.icon}
+                </div>
 
-                <div className="quest-title-row">
 
-                  <div>
+                <div className="quest-details">
 
-                    <small>
-                      DAILY QUEST
-                    </small>
+                  <div className="quest-title-row">
 
-                    <h2>
-                      {quest.title}
-                    </h2>
+                    <div>
+
+                      <small>
+                        {quest.source ===
+                        "custom"
+                          ? "YOUR QUEST"
+                          : "DAILY QUEST"}
+                      </small>
+
+                      <h2>
+                        {quest.title}
+                      </h2>
+
+                    </div>
+
+                    <span className="quest-xp-reward">
+                      +{quest.xp} XP
+                    </span>
 
                   </div>
 
-                  <span className="quest-xp-reward">
-                    +{quest.xp} XP
-                  </span>
+
+                  <p>
+                    {quest.description}
+                  </p>
+
+
+                  {/* --------------------------------
+                      OPTIONAL DATE / TIME
+                  -------------------------------- */}
+
+                  {(quest.dueDate ||
+                    quest.dueTime) && (
+
+                    <div className="quest-schedule">
+
+                      {quest.dueDate && (
+                        <span>
+                          📅{" "}
+                          {formatDate(
+                            quest.dueDate
+                          )}
+                        </span>
+                      )}
+
+                      {quest.dueTime && (
+                        <span>
+                          ⏰{" "}
+                          {quest.dueTime}
+                        </span>
+                      )}
+
+                    </div>
+
+                  )}
+
+
+                  {/* --------------------------------
+                      OPTIONAL TIME MESSAGE
+                  -------------------------------- */}
+
+                  {quest.source ===
+                    "custom" &&
+                    !quest.dueTime && (
+                      <div className="quest-flexible-time">
+                        🕐 No specific time
+                      </div>
+                    )}
 
                 </div>
 
-                <p>
-                  {quest.description}
-                </p>
 
-              </div>
+                {/* =================================
+                    ACTIONS
+                ================================= */}
 
-              <button
-                className="complete-quest-button"
-                disabled={
-                  quest.completed
-                }
-                onClick={() =>
-                  completeQuest(
-                    quest.id
-                  )
-                }
-              >
-                {quest.completed
-                  ? "✓ COMPLETED"
-                  : "COMPLETE"}
-              </button>
+                <div className="quest-card-actions">
 
-            </article>
+                  <button
+                    className="complete-quest-button"
+                    disabled={
+                      quest.completed
+                    }
+                    onClick={() =>
+                      completeQuest(
+                        quest.id
+                      )
+                    }
+                  >
+                    {quest.completed
+                      ? "✓ COMPLETED"
+                      : "COMPLETE"}
+                  </button>
 
-          ))
+
+                  {quest.source ===
+                    "custom" && (
+
+                    <button
+                      className="delete-quest-button"
+                      onClick={() =>
+                        deleteQuest(
+                          quest.id
+                        )
+                      }
+                      title="Delete quest"
+                    >
+                      🗑️
+                    </button>
+
+                  )}
+
+                </div>
+
+              </article>
+
+            )
+          )
 
         )}
 
@@ -661,13 +1203,369 @@ function Quests() {
 
           <button
             onClick={() =>
-              navigate("/world")
+              navigate(
+                "/world"
+              )
             }
           >
             🌍 Explore Your World
           </button>
 
         </section>
+
+      )}
+
+
+      {/* =====================================
+          ADD QUEST MODAL
+      ===================================== */}
+
+      {showAddQuest && (
+
+        <div
+          className="add-quest-overlay"
+          onClick={(event) => {
+
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeAddQuest();
+            }
+
+          }}
+        >
+
+          <div className="add-quest-modal">
+
+            {/* =================================
+                HEADER
+            ================================= */}
+
+            <div className="add-quest-header">
+
+              <div>
+
+                <p>
+                  📜 QUEST CREATION
+                </p>
+
+                <h2>
+                  Add New Quest
+                </h2>
+
+                <span>
+                  Create something you want
+                  to remember and complete.
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                className="close-quest-modal"
+                onClick={
+                  closeAddQuest
+                }
+              >
+                ✕
+              </button>
+
+            </div>
+
+
+            {/* =================================
+                TITLE
+            ================================= */}
+
+            <div className="quest-form-group">
+
+              <label>
+                Quest title *
+              </label>
+
+              <input
+                type="text"
+                value={
+                  questTitle
+                }
+                onChange={(event) =>
+                  setQuestTitle(
+                    event.target.value
+                  )
+                }
+                placeholder="e.g. Study Physics Chapter 3"
+                maxLength={100}
+              />
+
+            </div>
+
+
+            {/* =================================
+                DESCRIPTION
+            ================================= */}
+
+            <div className="quest-form-group">
+
+              <label>
+                Description
+                <span>
+                  Optional
+                </span>
+              </label>
+
+              <textarea
+                value={
+                  questDescription
+                }
+                onChange={(event) =>
+                  setQuestDescription(
+                    event.target.value
+                  )
+                }
+                placeholder="What do you want to accomplish?"
+                maxLength={500}
+              />
+
+            </div>
+
+
+            {/* =================================
+                DATE
+            ================================= */}
+
+            <div className="quest-form-group">
+
+              <label>
+                Due date
+                <span>
+                  Optional
+                </span>
+              </label>
+
+              <input
+                type="date"
+                value={
+                  questDate
+                }
+                onChange={(event) =>
+                  setQuestDate(
+                    event.target.value
+                  )
+                }
+              />
+
+            </div>
+
+
+            {/* =================================
+                TIME
+            ================================= */}
+
+            <div className="quest-form-group">
+
+              <label>
+                Specific time
+                <span>
+                  Optional
+                </span>
+              </label>
+
+              <input
+                type="time"
+                value={
+                  questTime
+                }
+                onChange={(event) =>
+                  setQuestTime(
+                    event.target.value
+                  )
+                }
+              />
+
+              <div className="quest-form-help">
+                Leave this empty if you only want to remember the task.
+              </div>
+
+            </div>
+
+
+            {/* =================================
+                DIFFICULTY
+            ================================= */}
+
+            <div className="quest-form-group">
+
+              <label>
+                Difficulty
+              </label>
+
+              <div className="difficulty-options">
+
+                {/* EASY */}
+
+                <button
+                  type="button"
+                  className={
+                    questDifficulty ===
+                    "easy"
+                      ? "selected"
+                      : ""
+                  }
+                  onClick={() =>
+                    setQuestDifficulty(
+                      "easy"
+                    )
+                  }
+                >
+                  <span>
+                    ⭐
+                  </span>
+
+                  <strong>
+                    Easy
+                  </strong>
+
+                  <small>
+                    +5 XP
+                  </small>
+                </button>
+
+
+                {/* MEDIUM */}
+
+                <button
+                  type="button"
+                  className={
+                    questDifficulty ===
+                    "medium"
+                      ? "selected"
+                      : ""
+                  }
+                  onClick={() =>
+                    setQuestDifficulty(
+                      "medium"
+                    )
+                  }
+                >
+                  <span>
+                    ⭐⭐
+                  </span>
+
+                  <strong>
+                    Medium
+                  </strong>
+
+                  <small>
+                    +10 XP
+                  </small>
+                </button>
+
+
+                {/* HARD */}
+
+                <button
+                  type="button"
+                  className={
+                    questDifficulty ===
+                    "hard"
+                      ? "selected"
+                      : ""
+                  }
+                  onClick={() =>
+                    setQuestDifficulty(
+                      "hard"
+                    )
+                  }
+                >
+                  <span>
+                    ⭐⭐⭐
+                  </span>
+
+                  <strong>
+                    Hard
+                  </strong>
+
+                  <small>
+                    +15 XP
+                  </small>
+                </button>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================
+                FLEXIBLE TIME INFO
+            ================================= */}
+
+            <div className="quest-flexible-info">
+
+              <span>
+                🕐
+              </span>
+
+              <div>
+
+                <strong>
+                  Study on your terms
+                </strong>
+
+                <p>
+                  Date and time are optional.
+                  Add only what you need.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================
+                FORM ERROR
+            ================================= */}
+
+            {formError && (
+
+              <div className="quest-form-error">
+                ⚠️ {formError}
+              </div>
+
+            )}
+
+
+            {/* =================================
+                ACTIONS
+            ================================= */}
+
+            <div className="add-quest-actions">
+
+              <button
+                type="button"
+                className="cancel-quest-button"
+                onClick={
+                  closeAddQuest
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="save-quest-button"
+                onClick={
+                  addQuest
+                }
+              >
+                ⚔️ Create Quest
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
 
       )}
 
@@ -716,6 +1614,7 @@ function Quests() {
             </span>
 
             <div className="reward-xp">
+
               <small>
                 REWARD
               </small>
@@ -723,6 +1622,7 @@ function Quests() {
               <strong>
                 +{reward.xp} XP
               </strong>
+
             </div>
 
             <button
