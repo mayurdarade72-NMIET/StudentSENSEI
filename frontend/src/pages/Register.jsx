@@ -2,18 +2,44 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-function EmailLogin() {
+function Register() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setError("");
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    setError("");
+    const {
+      name,
+      email,
+      password,
+      confirmPassword,
+    } = formData;
+
+    if (!name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
 
     if (!email.trim()) {
       setError("Please enter your email.");
@@ -25,20 +51,39 @@ function EmailLogin() {
       return;
     }
 
-    if (!password) {
-      setError("Please enter your password.");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
 
     setLoading(true);
 
-    // Temporary frontend-only login.
-    // This will later connect to Mayur's backend authentication.
+    // Temporary frontend-only registration.
+    // This will later connect to Mayur's backend.
     setTimeout(() => {
-      localStorage.setItem("studentSenseiLoggedIn", "true");
-      localStorage.setItem("studentSenseiUserEmail", email);
+      localStorage.setItem(
+        "studentSenseiLoggedIn",
+        "true"
+      );
 
-      navigate("/dashboard", { replace: true });
+      localStorage.setItem(
+        "studentSenseiUserEmail",
+        email
+      );
+
+      localStorage.setItem(
+        "studentSenseiUserName",
+        name
+      );
+
+      navigate("/dashboard", {
+        replace: true,
+      });
     }, 500);
   };
 
@@ -52,6 +97,7 @@ function EmailLogin() {
       <section className="auth-world-panel">
 
         <div className="auth-world-background">
+
           <div className="sun"></div>
 
           <div className="mountain mountain-one"></div>
@@ -62,6 +108,7 @@ function EmailLogin() {
           <div className="pixel-cloud cloud-two"></div>
 
           <div className="village-glow"></div>
+
         </div>
 
         <div className="version-label">
@@ -69,6 +116,7 @@ function EmailLogin() {
         </div>
 
         <div className="brand-block">
+
           <div className="brand-title">
             STUDENT<span>SENSEI</span>
           </div>
@@ -78,37 +126,39 @@ function EmailLogin() {
             <br />
             YOUR SUCCESS WORLD.
           </p>
+
         </div>
 
         <div className="adventure-character">
+
           <div className="character-head">
             <div className="character-hair"></div>
+
             <div className="character-eye eye-left"></div>
             <div className="character-eye eye-right"></div>
           </div>
 
           <div className="character-body">
+
             <div className="character-arm arm-left"></div>
+
             <div className="character-torso"></div>
+
             <div className="character-arm arm-right"></div>
+
           </div>
+
         </div>
 
         <div className="world-sign">
+
           <div className="sign-board">
 
             <button
               className="world-primary-button"
-              onClick={() => navigate("/register")}
-            >
-              START YOUR JOURNEY
-            </button>
-
-            <button
-              className="world-secondary-button"
               onClick={() => navigate("/login")}
             >
-              BACK TO LOGIN
+              ALREADY HAVE AN ACCOUNT
             </button>
 
             <button
@@ -119,6 +169,7 @@ function EmailLogin() {
             </button>
 
           </div>
+
         </div>
 
         <div className="world-features">
@@ -129,7 +180,7 @@ function EmailLogin() {
       </section>
 
       {/* =========================================
-          LOGIN SIDE
+          REGISTER SIDE
           ========================================= */}
 
       <section className="auth-login-panel">
@@ -146,16 +197,16 @@ function EmailLogin() {
           <div className="auth-login-header">
 
             <p className="auth-welcome">
-              EMAIL SIGN IN
+              CREATE YOUR ACCOUNT
             </p>
 
             <h1>
-              Welcome Back.
+              Begin Your Journey.
             </h1>
 
             <p className="auth-subtitle">
-              Enter your email and password to continue your
-              StudentSENSEI journey.
+              Create your StudentSENSEI account and start
+              building your study world.
             </p>
 
           </div>
@@ -172,13 +223,28 @@ function EmailLogin() {
               </span>
 
               <input
+                type="text"
+                name="name"
+                placeholder="Student Name"
+                value={formData.name}
+                onChange={handleChange}
+                autoComplete="name"
+              />
+
+            </div>
+
+            <div className="auth-input-wrapper">
+
+              <span className="input-icon">
+                ✉
+              </span>
+
+              <input
                 type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                  setError("");
-                }}
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
                 autoComplete="email"
               />
 
@@ -192,13 +258,28 @@ function EmailLogin() {
 
               <input
                 type="password"
+                name="password"
                 placeholder="Password"
-                value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  setError("");
-                }}
-                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="new-password"
+              />
+
+            </div>
+
+            <div className="auth-input-wrapper">
+
+              <span className="input-icon">
+                🛡
+              </span>
+
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                autoComplete="new-password"
               />
 
             </div>
@@ -210,18 +291,13 @@ function EmailLogin() {
             )}
 
             <button
-              type="button"
-              className="forgot-password"
-            >
-              Forgot Password?
-            </button>
-
-            <button
               type="submit"
               className="game-login-button"
               disabled={loading}
             >
-              {loading ? "SIGNING IN..." : "LOG IN"}
+              {loading
+                ? "CREATING ACCOUNT..."
+                : "CREATE ACCOUNT"}
             </button>
 
             <div className="auth-or">
@@ -233,7 +309,7 @@ function EmailLogin() {
               className="google-game-button"
               onClick={() =>
                 alert(
-                  "Google Sign-In will be connected when backend authentication is integrated."
+                  "Google Sign-Up will be connected when backend authentication is integrated."
                 )
               }
             >
@@ -242,42 +318,20 @@ function EmailLogin() {
               </span>
 
               <span>
-                CONTINUE WITH GOOGLE
+                SIGN UP WITH GOOGLE
               </span>
             </button>
 
             <p className="new-player">
-              New here?
+              Already have an account?
 
               <button
                 type="button"
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/email-login")}
               >
-                Start your journey
+                Log in
               </button>
             </p>
-
-            <button
-              type="button"
-              className="guest-link"
-              onClick={() => {
-                localStorage.setItem(
-                  "studentSenseiLoggedIn",
-                  "true"
-                );
-
-                localStorage.setItem(
-                  "studentSenseiUserName",
-                  "Guest Student"
-                );
-
-                navigate("/dashboard", {
-                  replace: true,
-                });
-              }}
-            >
-              Continue as Guest
-            </button>
 
           </form>
 
@@ -289,4 +343,4 @@ function EmailLogin() {
   );
 }
 
-export default EmailLogin;
+export default Register;

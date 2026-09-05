@@ -1,0 +1,696 @@
+/* ==========================================
+   STUDENTSENSEI RPG AUTH
+   ========================================== */
+
+.auth-page {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 62% 38%;
+  overflow: hidden;
+  background: #07101a;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ==========================================
+   WORLD SIDE
+   ========================================== */
+
+.auth-world-panel {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 38px 40px 28px;
+  box-sizing: border-box;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(9, 35, 63, 0.15),
+      rgba(4, 24, 19, 0.45)
+    );
+}
+
+.auth-world-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      to bottom,
+      #173b68 0%,
+      #4386b5 38%,
+      #e3a15e 63%,
+      #4f753f 76%,
+      #1e3c28 100%
+    );
+  z-index: 0;
+}
+
+.auth-world-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.03),
+      rgba(0, 0, 0, 0.28)
+    );
+
+  z-index: 5;
+}
+
+/* ==========================================
+   SUN
+   ========================================== */
+
+.sun {
+  position: absolute;
+  width: 145px;
+  height: 145px;
+  border-radius: 50%;
+  background: #ffd56b;
+  top: 37%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 50px rgba(255, 198, 83, 0.8),
+    0 0 120px rgba(255, 178, 61, 0.45);
+}
+
+/* ==========================================
+   MOUNTAINS
+   ========================================== */
+
+.mountain {
+  position: absolute;
+  bottom: 18%;
+  width: 0;
+  height: 0;
+  border-left: 210px solid transparent;
+  border-right: 210px solid transparent;
+  border-bottom: 260px solid #314f48;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.15));
+}
+
+.mountain-one {
+  left: -100px;
+}
+
+.mountain-two {
+  left: 30%;
+  bottom: 15%;
+  border-left-width: 280px;
+  border-right-width: 280px;
+  border-bottom-width: 320px;
+  border-bottom-color: #385d4f;
+}
+
+.mountain-three {
+  right: -170px;
+  bottom: 14%;
+  border-left-width: 260px;
+  border-right-width: 260px;
+  border-bottom-width: 300px;
+  border-bottom-color: #284a42;
+}
+
+/* ==========================================
+   CLOUDS
+   ========================================== */
+
+.pixel-cloud {
+  position: absolute;
+  width: 150px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 3px;
+  opacity: 0.65;
+}
+
+.pixel-cloud::before,
+.pixel-cloud::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border-radius: 3px;
+}
+
+.pixel-cloud::before {
+  width: 55px;
+  height: 45px;
+  left: 22px;
+  bottom: 0;
+}
+
+.pixel-cloud::after {
+  width: 65px;
+  height: 52px;
+  right: 25px;
+  bottom: 0;
+}
+
+.cloud-one {
+  top: 15%;
+  left: 18%;
+}
+
+.cloud-two {
+  top: 23%;
+  right: 15%;
+  transform: scale(0.8);
+}
+
+/* ==========================================
+   VILLAGE GLOW
+   ========================================== */
+
+.village-glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(12, 48, 29, 0.95),
+      rgba(20, 66, 42, 0)
+    );
+}
+
+/* ==========================================
+   VERSION
+   ========================================== */
+
+.version-label {
+  position: relative;
+  z-index: 10;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #e9f2e9;
+}
+
+/* ==========================================
+   BRAND
+   ========================================== */
+
+.brand-block {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  margin-top: 25px;
+}
+
+.brand-title {
+  font-size: clamp(42px, 6vw, 82px);
+  line-height: 0.9;
+  font-weight: 1000;
+  letter-spacing: -4px;
+
+  color: #ffffff;
+
+  text-shadow:
+    4px 4px 0 #18242a,
+    7px 7px 0 rgba(0, 0, 0, 0.65);
+}
+
+.brand-title span {
+  color: #48ef85;
+}
+
+.brand-block p {
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* ==========================================
+   CHARACTER
+   ========================================== */
+
+.adventure-character {
+  position: relative;
+  z-index: 10;
+  margin-top: auto;
+  margin-bottom: 12px;
+  transform: scale(1.15);
+}
+
+.character-head {
+  width: 76px;
+  height: 76px;
+  background: #a96b45;
+  position: relative;
+  border: 5px solid #33251e;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.28);
+}
+
+.character-hair {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: #39251d;
+}
+
+.character-eye {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #20292b;
+  top: 38px;
+}
+
+.eye-left {
+  left: 17px;
+}
+
+.eye-right {
+  right: 17px;
+}
+
+.character-body {
+  position: relative;
+  width: 92px;
+  height: 95px;
+  margin-top: 5px;
+}
+
+.character-torso {
+  position: absolute;
+  width: 58px;
+  height: 76px;
+  left: 17px;
+  background: #1591a7;
+  border: 5px solid #163944;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.28);
+}
+
+.character-arm {
+  position: absolute;
+  width: 22px;
+  height: 70px;
+  background: #2a6872;
+  top: 4px;
+  border: 4px solid #163944;
+}
+
+.arm-left {
+  left: -2px;
+}
+
+.arm-right {
+  right: -2px;
+}
+
+/* ==========================================
+   WORLD SIGN
+   ========================================== */
+
+.world-sign {
+  position: relative;
+  z-index: 10;
+  width: min(410px, 90%);
+  padding: 8px;
+  background: #5c3d23;
+  border: 5px solid #2d2017;
+  box-shadow:
+    8px 8px 0 rgba(0, 0, 0, 0.35),
+    inset 0 0 0 3px #8b623a;
+}
+
+.sign-board {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 18px;
+  background: #76502f;
+}
+
+.world-primary-button,
+.world-secondary-button,
+.world-explore-button {
+  width: 100%;
+  border: 3px solid #1d2b1e;
+  padding: 14px 12px;
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+  cursor: pointer;
+  color: #ffffff;
+  transition: 0.15s ease;
+  text-shadow: 1px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.world-primary-button {
+  background: #43bb3d;
+  box-shadow: inset 0 -4px 0 #258328;
+}
+
+.world-secondary-button {
+  background: #514334;
+  box-shadow: inset 0 -4px 0 #31291f;
+}
+
+.world-explore-button {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.world-primary-button:hover,
+.world-secondary-button:hover,
+.world-explore-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+/* ==========================================
+   WORLD FEATURES
+   ========================================== */
+
+.world-features {
+  position: relative;
+  z-index: 10;
+  width: min(500px, 100%);
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 18px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* ==========================================
+   LOGIN PANEL
+   ========================================== */
+
+.auth-login-panel {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      135deg,
+      #111b2d,
+      #18223a 55%,
+      #111a2a
+    );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 45px;
+  box-sizing: border-box;
+  border-left: 4px solid #0b121e;
+}
+
+.auth-login-inner {
+  width: 100%;
+  max-width: 430px;
+}
+
+/* ==========================================
+   HEADER
+   ========================================== */
+
+.auth-login-header {
+  margin-bottom: 35px;
+}
+
+.auth-welcome {
+  margin: 0;
+  color: #f3f4f2;
+  font-size: clamp(25px, 3vw, 38px);
+  font-weight: 1000;
+  letter-spacing: 1px;
+}
+
+.auth-login-header h1 {
+  margin: 2px 0 8px;
+  color: #f0c849;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 1000;
+  letter-spacing: 1px;
+  text-shadow: 3px 3px 0 #2c2c2c;
+}
+
+.auth-subtitle {
+  margin: 0;
+  color: #aab4c3;
+  font-size: 14px;
+}
+
+/* ==========================================
+   FORM
+   ========================================== */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-input-wrapper {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.18);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  transition: 0.2s ease;
+}
+
+.auth-input-wrapper:focus-within {
+  border-color: #55d95d;
+  box-shadow: 0 0 0 3px rgba(85, 217, 93, 0.1);
+}
+
+.input-icon {
+  width: 48px;
+  text-align: center;
+  font-size: 18px;
+  opacity: 0.75;
+}
+
+.auth-input-wrapper input {
+  flex: 1;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.auth-input-wrapper input::placeholder {
+  color: #8791a1;
+}
+
+/* ==========================================
+   FORGOT
+   ========================================== */
+
+.forgot-password {
+  align-self: flex-start;
+  border: 0;
+  background: transparent;
+  color: #48d8e8;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================
+   LOGIN
+   ========================================== */
+
+.game-login-button {
+  width: 100%;
+  height: 52px;
+  border: 3px solid #216c21;
+  background: #48bd35;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: inset 0 -5px 0 #278021;
+  transition: 0.15s ease;
+}
+
+.game-login-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+/* ==========================================
+   OR
+   ========================================== */
+
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #8893a3;
+  font-size: 12px;
+  margin: 5px 0;
+}
+
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================
+   GOOGLE
+   ========================================== */
+
+.google-game-button {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 2px solid #d0d4d8;
+  background: #ffffff;
+  color: #252a2f;
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.google-game-button:hover {
+  background: #f0f1f2;
+  transform: translateY(-2px);
+}
+
+.google-game-icon {
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 1000;
+  color: #4285f4;
+}
+
+/* ==========================================
+   REGISTER
+   ========================================== */
+
+.new-player {
+  text-align: center;
+  margin: 18px 0 0;
+  color: #8e98a7;
+  font-size: 12px;
+}
+
+.new-player button {
+  border: 0;
+  background: transparent;
+  color: #54e56b;
+  font-weight: 900;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.new-player button:hover {
+  text-decoration: underline;
+}
+
+.guest-link {
+  border: 0;
+  background: transparent;
+  color: #687487;
+  font-size: 11px;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.guest-link:hover {
+  color: #aab4c3;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 950px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-world-panel {
+    min-height: 55vh;
+  }
+
+  .auth-login-panel {
+    min-height: auto;
+    border-left: 0;
+    border-top: 4px solid #0b121e;
+    padding: 45px 25px;
+  }
+
+  .adventure-character {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 600px) {
+  .auth-world-panel {
+    min-height: 470px;
+    padding: 25px 18px 20px;
+  }
+
+  .brand-title {
+    font-size: 42px;
+    letter-spacing: -2px;
+  }
+
+  .brand-block p {
+    font-size: 10px;
+  }
+
+  .world-sign {
+    width: 92%;
+  }
+
+  .world-features {
+    gap: 12px;
+    font-size: 8px;
+  }
+
+  .auth-login-panel {
+    padding: 35px 20px;
+  }
+
+  .auth-welcome {
+    font-size: 28px;
+  }
+
+  .auth-login-header h1 {
+    font-size: 38px;
+  }
+}

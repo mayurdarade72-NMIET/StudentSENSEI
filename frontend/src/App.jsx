@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -5,175 +6,125 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { useEffect, useState } from "react";
-
 import Dashboard from "./pages/Dashboard";
 import Focus from "./pages/Focus";
 import World from "./pages/World";
 import Quests from "./pages/Quests";
 import Achievements from "./pages/Achievements";
+import Login from "./pages/Login";
+import EmailLogin from "./pages/EmailLogin";
+import Register from "./pages/Register";
+
+import "./App.css";
+
+function ProtectedRoute({ children }) {
+  const isLoggedIn =
+    localStorage.getItem("studentSenseiLoggedIn") === "true";
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
 
 function App() {
-  // =========================================
-  // BACKEND CONNECTION TEST
-  // =========================================
-
-  const [backendStatus, setBackendStatus] =
-    useState("Checking backend...");
+  const [backendStatus, setBackendStatus] = useState("checking");
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/")
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Backend request failed");
-        }
-
-        return response.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          setBackendStatus(
-            "Backend connected successfully"
-          );
+        if (response.ok) {
+          setBackendStatus("connected");
         } else {
-          setBackendStatus(
-            "Backend responded, but returned an error"
-          );
+          setBackendStatus("failed");
         }
       })
-      .catch((error) => {
-        console.error(
-          "Backend connection error:",
-          error
-        );
-
-        setBackendStatus(
-          "Backend connection failed"
-        );
+      .catch(() => {
+        setBackendStatus("failed");
       });
   }, []);
 
-  const backendConnected =
-    backendStatus ===
-    "Backend connected successfully";
-
   return (
     <BrowserRouter>
+      <div className="app">
+        {backendStatus !== "connected" && (
+          <div className="backend-status">
+            {backendStatus === "checking"
+              ? "Checking backend..."
+              : "Backend connection failed"}
+          </div>
+        )}
 
-      {/* =====================================
-          BACKEND STATUS
-      ===================================== */}
+        <Routes>
+          {/* Authentication */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-      <div
-        style={{
-          position: "fixed",
-          top: "18px",
-          right: "18px",
-          zIndex: 9999,
+          <Route path="/login" element={<Login />} />
 
-          padding: "9px 15px",
+          <Route
+            path="/email-login"
+            element={<EmailLogin />}
+          />
 
-          borderRadius: "10px",
+          <Route
+            path="/register"
+            element={<Register />}
+          />
 
-          background: backendConnected
-            ? "#22c55e"
-            : "#f59e0b",
+          {/* Protected Application */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-          color: "white",
+          <Route
+            path="/focus"
+            element={
+              <ProtectedRoute>
+                <Focus />
+              </ProtectedRoute>
+            }
+          />
 
-          fontSize: "12px",
+          <Route
+            path="/quests"
+            element={
+              <ProtectedRoute>
+                <Quests />
+              </ProtectedRoute>
+            }
+          />
 
-          fontWeight: "700",
+          <Route
+            path="/world"
+            element={
+              <ProtectedRoute>
+                <World />
+              </ProtectedRoute>
+            }
+          />
 
-          boxShadow:
-            "0 6px 18px rgba(0,0,0,0.3)",
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute>
+                <Achievements />
+              </ProtectedRoute>
+            }
+          />
 
-          border: "1px solid rgba(255,255,255,0.15)",
-
-          maxWidth: "220px",
-
-          textAlign: "center",
-
-          pointerEvents: "none",
-        }}
-      >
-        {backendStatus}
+          {/* Unknown route */}
+          <Route
+            path="*"
+            element={<Navigate to="/login" replace />}
+          />
+        </Routes>
       </div>
-
-
-      {/* =====================================
-          ROUTES
-      ===================================== */}
-
-      <Routes>
-
-        {/* DASHBOARD */}
-
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-
-        {/* FOCUS MINE */}
-
-        <Route
-          path="/focus"
-          element={<Focus />}
-        />
-
-
-        {/* QUESTS */}
-
-        <Route
-          path="/quests"
-          element={<Quests />}
-        />
-
-
-        {/* WORLD */}
-
-        <Route
-          path="/world"
-          element={<World />}
-        />
-
-
-        {/* ACHIEVEMENTS */}
-
-        <Route
-          path="/achievements"
-          element={<Achievements />}
-        />
-
-
-        {/* DEFAULT */}
-
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          }
-        />
-
-
-        {/* UNKNOWN ROUTES */}
-
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          }
-        />
-
-      </Routes>
-
     </BrowserRouter>
   );
 }
